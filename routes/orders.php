@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Order\OrderRequestController;
 use App\Http\Controllers\Order\ProductReturnsController;
+use App\Http\Controllers\Order\ShippingController;
 
 Route::group(['prefix' => 'requests'], function() {
     Route::get('/', [OrderRequestController::class, 'index'])->name('order-requests.index');
@@ -23,4 +24,9 @@ Route::group(['prefix' => 'returns'], function() {
     Route::post('/', [ProductReturnsController::class, 'store'])->name('product-returns.store');
     Route::put('/{id}', [ProductReturnsController::class, 'update'])->name('product-returns.update');
     Route::delete('/{id}', [ProductReturnsController::class, 'destroy'])->name('product-returns.destroy');
+});
+
+Route::group(['prefix' => 'shipping'], function() {
+    Route::get('/', [ShippingController::class, 'index'])->name('shipping.index');
+    Route::post('/', [ShippingController::class, 'store'])->name('shipping.store');
 });

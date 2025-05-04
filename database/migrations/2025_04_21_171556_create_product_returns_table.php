@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->nullable()->constrained()->onDelete('cascade');
             $table->enum('return_type',['manual','invoice','customer'])->default('manual'); // manual, invoice, customer
             $table->date('return_date');
+            $table->boolean('is_tax_and_discount')->default(false); 
             $table->string('total_quantity')->nullable(); // total quantity of items returned
             $table->decimal('total_amount', 10, 2); // sum of all return items
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending'); // status of the return

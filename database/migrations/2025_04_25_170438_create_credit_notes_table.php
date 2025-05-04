@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('cascade');
             $table->foreignId('invoice_id')->nullable()->constrained('invoices')->onDelete('cascade');
+            $table->foreignId('product_return_id')->nullable()->constrained('product_returns')->nullOnDelete();
             $table->enum('credit_note_type',['manual','from_return'])->default('manual'); // manual, from_return
             $table->date('credit_note_date');
             $table->decimal('total_amount', 10, 2); // sum of all credit note items

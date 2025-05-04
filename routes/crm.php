@@ -14,6 +14,7 @@ Route::group(['prefix' => 'leads'], function() {
     Route::put('/{lead}', [LeadsController::class, 'update'])->name('leads.update');
     Route::delete('/{lead}', [LeadsController::class, 'destroy'])->name('leads.destroy');
     Route::get('/leads/{lead}/convert/{type}', [LeadsController::class, 'convert'])->name('leads.convert');
+    Route::get('/logs/{lead}', [LeadsController::class, 'logs'])->name('leads.logs');
 });
 Route::group(['prefix' => 'customers'], function() {
     Route::get('/', [CustomerController::class, 'index'])->name('customers.index');

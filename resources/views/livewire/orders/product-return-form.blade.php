@@ -1,6 +1,6 @@
 <div>
     <form wire:submit.prevent="submitReturn">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 p-4">
             <!-- Return general information -->
             <div>
                 <label for="returnType" class="block text-sm font-medium text-gray-700 mb-1">Return Type</label>
@@ -73,7 +73,7 @@
         </div>
     
         <!-- Submit -->
-        <div class="mt-6">
+        <div class="mt-6 flex justify-end">
             <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Submit Return
             </button>

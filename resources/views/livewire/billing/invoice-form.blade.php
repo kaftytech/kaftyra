@@ -1,6 +1,6 @@
 <div>
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="bg-indigo-600 text-white px-6 py-4">
+    <div class="bg-white shadow-md mt-4 rounded-lg overflow-hidden">
+        {{-- <div class="bg-indigo-600 text-white px-6 py-4">
             <h4 class="text-xl font-semibold">
                 @if($currentStep == 1)
                     Create New Invoice
@@ -10,7 +10,7 @@
                     Invoice Created Successfully
                 @endif
             </h4>
-        </div>
+        </div> --}}
         
         <div class="p-2">
             <!-- Step indicators -->
@@ -71,11 +71,11 @@
                             </select>
                             @error('order_request_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
-                        <div>
+                        {{-- <div>
                             <label for="invoiceNumber" class="block text-sm font-medium text-gray-700 mb-1">Invoice Number</label>
                             <input type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" id="invoiceNumber" wire:model.live="invoice_number">
                             @error('invoice_number') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
+                        </div> --}}
                         <div>
                             <label for="invoiceDate" class="block text-sm font-medium text-gray-700 mb-1">Invoice Date</label>
                             <input type="date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" id="invoiceDate" wire:model.live="invoice_date">
@@ -103,7 +103,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                                     {{-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available</th> --}}
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount Type</th>
+                                    {{-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount Type</th> --}}
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
@@ -113,8 +113,8 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($invoiceItems as $index => $item)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <select class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" 
+                                    <td class="px-4 py-4 whitespace-nowrap w-64">
+                                        <select class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm"
                                             wire:model.live="invoiceItems.{{ $index }}.product_id"
                                             wire:change="productSelected({{ $index }}, $event.target.value)">
                                             <option value="">Select Product</option>
@@ -126,11 +126,12 @@
                                         </select>
                                         @error("invoiceItems.$index.product_id") <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                     </td>
+                                    
                                     {{-- <td class="px-6 py-4 whitespace-nowrap">
                                         <input type="text" class="w-full rounded-md border-gray-300 bg-gray-100 shadow-sm text-sm" 
                                             value="{{ $item['hsn_code'] ?? '' }}" readonly>
                                     </td> --}}                                    
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-1 py-4 whitespace-nowrap">
                                         <input type="number" min="1" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" 
                                             wire:model.live="invoiceItems.{{ $index }}.price">
                                         @error("invoiceItems.$index.price") <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -145,30 +146,60 @@
                                             {{ $item['available_stock'] ?? 0 }}
                                         </span>
                                     </td> --}}
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <select wire:model.live="invoiceItems.{{ $index }}.discount_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
-                                            <option value="">Discount Type</option>
-                                            <option value="percentage">Percentage</option>
-                                            <option value="fixed">Fixed Amount</option>
+                                    {{-- <td class="px-1 py-4 whitespace-nowrap">
+                                        <select wire:model.live="invoiceItems.{{ $index }}.discount_type" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                                            <option value="percentage">%</option>
+                                            <option value="fixed">₹</option>
                                             <option value="free">Free</option>
                                         </select>
                                         @error("invoiceItems.$index.discount_type") <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    </td> --}}
+                                    <td class="whitespace-nowrap">
+                                        <div class="flex w-full">
+                                            <!-- Discount Type Dropdown -->
+                                            <select wire:model.live="invoiceItems.{{ $index }}.discount_type"
+                                                class="rounded-s-md border border-gray-300 bg-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500">
+                                                <option value="percentage">%</option>
+                                                <option value="fixed">₹</option>
+                                            </select>
+                                    
+                                            <!-- Discount Input Field -->
+                                            <input type="number" step="0.01"
+                                                wire:model.live="invoiceItems.{{ $index }}.discount"
+                                                class="rounded-e-md border border-l-0 border-gray-300 text-sm w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500" 
+                                                placeholder="Discount">
+                                    
+                                        </div>
+                                    
+                                        <!-- Validation Errors -->
+                                        @error("invoiceItems.$index.discount_type") 
+                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
+                                        @enderror
+                                        @error("invoiceItems.$index.discount") 
+                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
+                                        @enderror
                                     </td>
+                                    
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <input type="number" step="0.01" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" 
-                                            wire:model.live="invoiceItems.{{ $index }}.discount">
-                                        @error("invoiceItems.$index.discount") <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                        <div class="flex w-full">                                          
+                                    
+                                            <!-- Tax Amount Input (readonly) -->
+                                            <input type="text"
+                                                class="rounded-e-md border border-l-0 border-gray-300 text-sm w-full px-3 py-2 bg-gray-100"
+                                                value="{{ $item['tax_amount'] ?? 0 }}"
+                                                readonly>
+                                                <!-- Static Tax Percentage Display (acts like a disabled select) -->
+                                            <span class="inline-flex items-center px-3 bg-gray-200 rounded-s-md border border-gray-300 bg-gray-100 text-sm text-gray-700">
+                                                {{ $item['tax_percentage'] ?? 0 }}%
+                                            </span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <input type="text" class="w-full rounded-md border-gray-300 bg-gray-100 shadow-sm text-sm" 
-                                            value="{{ $item['tax_amount'] ?? 0 }}" readonly>
-                                        <small class="text-gray-500">{{ $item['tax_percentage'] ?? 0 }}%</small>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    
+                                    <td class="text-right whitespace-nowrap">
                                         <input type="text" class="w-full rounded-md border-gray-300 bg-gray-100 shadow-sm text-sm" 
                                             value="{{ $item['net_total'] ?? 0 }}" readonly>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-2 text-right whitespace-nowrap">
                                         <button type="button" class="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" 
                                             wire:click="removeItem({{ $index }})">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -255,28 +286,37 @@
                                             number_format($discount, 2) }}
                                     </div>
                                 </div>
+                                @foreach($taxes as $tax)
                                 <div class="grid grid-cols-2 gap-2 py-2">
                                     <div class="text-sm text-gray-600">
                                         <div class="flex items-center space-x-2">
+                                            <input type="checkbox" wire:model.live="selectedTaxes.{{ $tax->name }}" class="text-indigo-500">
                                             <div class="flex-1">
-                                                <input type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" 
-                                                    placeholder="Tax Type" wire:model.live="tax_type">
+                                                <input type="text" class="w-full rounded-md border-gray-300 shadow-sm text-sm bg-gray-100"
+                                                    value="{{ $tax->name }}" readonly>
                                             </div>
                                             <div class="flex-1">
-                                                <input type="number" step="0.01" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" 
-                                                    placeholder="%" wire:model.live="tax_percentage">
+                                                <input type="number" step="0.01"
+                                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm"
+                                                    wire:model.live.debounce.300ms="taxValues.{{ $tax->name }}"
+                                                    @if(!($selectedTaxes[$tax->name] ?? false)) disabled @endif>
                                             </div>
                                             <span class="text-sm text-gray-500">%</span>
                                         </div>
                                     </div>
-                                    <div class="text-sm font-medium text-gray-900 text-right">{{ number_format($tax_amount, 2) }}</div>
+
+                                    <div class="text-sm font-medium text-gray-900 text-right">
+                                        ₹{{ number_format($this->calculateTax($tax->name), 2) }}
+                                    </div>
                                 </div>
+                            @endforeach
+
                                 <div class="my-3 border-t border-gray-200"></div>
                                 <div class="grid grid-cols-2 gap-2 py-2">
                                     <div class="text-sm font-bold text-gray-900">Total:</div>
                                     <div class="text-sm font-bold text-gray-900 text-right">{{ number_format($total_amount, 2) }}</div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 py-2">
+                                {{-- <div class="grid grid-cols-2 gap-2 py-2">
                                     <div class="text-sm text-gray-600">
                                         <div class="flex items-center space-x-2">
                                             <span class="text-sm text-gray-500">Paid</span>
@@ -287,7 +327,7 @@
                                         </div>
                                     </div>
                                     <div class="text-sm font-medium text-gray-900 text-right">{{ number_format($paid_amount, 2) }}</div>
-                                </div>
+                                </div> --}}
                                 <div class="grid grid-cols-2 gap-2 py-2">
                                     <div class="text-sm font-bold text-gray-900">Due Amount:</div>
                                     <div class="text-sm font-bold text-gray-900 text-right">{{ number_format($due_amount, 2) }}</div>
@@ -324,12 +364,12 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <h4 class="text-lg font-medium text-gray-800 mb-2">Company Name</h4>
+                        <h4 class="text-lg font-medium text-gray-800 mb-2">{{ $company->name }}</h4>
                         <div class="space-y-1 text-sm text-gray-600">
-                            <p>123 Company Address</p>
-                            <p>City, State, ZIP</p>
-                            <p>Phone: (123) 456-7890</p>
-                            <p>Email: example@company.com</p>
+                            <p>{{ $company->address_line_1 . ' ,' . $company->address_line_2 }}</p>
+                            <p>{{ $company->city . ', ' . $company->state . ' ' . $company->postal_code }}</p> 
+                            <p>Phone: {{ $company->phone ?? '' }}</p>
+                            <p>Email: {{ $company->email ?? '' }}</p>
                         </div>
                     </div>
                 </div>
@@ -380,7 +420,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">{{ $item['product_code'] ?? '-' }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">{{ number_format($item['price'], 2) }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">{{ $item['quantity'] }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">{{ number_format($item['discount'] ?? 0, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">{{ number_format($item['discount_amount'] ?? 0, 2) }} <span class="text-xs text-gray-400">({{ $item['discount_type'] === 'percentage' ? $item['discount'] . '%' : $item['discount_amount'] . ' ₹' ?? 0 }})</span></td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">
                                                 {{ number_format($item['tax_amount'] ?? 0, 2) }}
                                                 <span class="text-xs text-gray-400">({{ $item['tax_percentage'] ?? 0 }}%)</span>
@@ -399,10 +439,16 @@
                                     <td colspan="7" class="px-6 py-4 text-right font-bold text-gray-700 border border-gray-200">Discount</td>
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900 border border-gray-200">{{ number_format($discount, 2) }}</td>
                                 </tr>
-                                <tr>
-                                    <td colspan="7" class="px-6 py-4 text-right font-bold text-gray-700 border border-gray-200">Tax</td>
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900 border border-gray-200">{{ number_format($tax_amount, 2) }}</td>
-                                </tr>
+                                @foreach($taxablesData as $tax)
+                                    <tr>
+                                        <td colspan="7" class="px-6 py-4 text-right font-bold text-gray-700 border border-gray-200">
+                                            {{ $tax['tax_name'] }} ({{ rtrim(rtrim($tax['rate'], '0'), '.') }}%)
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 border border-gray-200">
+                                            {{ number_format($tax['amount'], 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
                                 <tr>
                                     <td colspan="7" class="px-6 py-4 text-right font-bold text-gray-700 border border-gray-200">Total</td>
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900 border border-gray-200">{{ number_format($total_amount, 2) }}</td>
@@ -420,13 +466,15 @@
                     </div>
                 </div>
                 
-                <div class="mt-8 flex justify-end">
-                    <select wire:model.live="invoiceType" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">                        
-                        <option value="draft">Draft</option>
-                        <option value="quotation">Quotation</option>
-                        <option value="final">Final</option>
-                    </select>
-                </div>
+                @if($invoiceType !== 'locked')
+                    <div class="mt-8 flex justify-end">
+                        <select wire:model.live="invoiceType" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">                        
+                            <option value="draft">Draft</option>
+                            <option value="quotation">Quotation</option>
+                            <option value="locked">Final</option>
+                        </select>
+                    </div>
+                @endif
                 <div class="mt-8 flex justify-end">
                     <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-300 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-4" wire:click="prevStep">
                         Back

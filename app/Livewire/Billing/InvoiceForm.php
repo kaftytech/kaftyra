@@ -10,10 +10,14 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Payment;
 use App\Models\Stock;
+use App\Models\StockAdjustment;
+use App\Models\TaxSetting;
+use App\Models\Company;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Log;
 
 class InvoiceForm extends Component
 {
@@ -33,8 +37,12 @@ class InvoiceForm extends Component
     public $invoice_date;
     public $discount_type = 'fixed';
     public $discount = 0;
-    public $tax_type = 'GST';
-    public $tax_percentage = 0;
+    // public $tax_type = 'GST';
+    // public $tax_percentage = 0;
+    public $taxes = []; // All active tax settings
+    public $selectedTaxes = []; // e.g., ['CGST' => true, 'SGST' => false]
+    public $taxValues = []; // e.g., ['CGST' => 9.00, 'SGST' => 9.00]
+    public $taxablesData = [];
     public $notes;
     public $payment_method;
     public $currency = 'INR';
@@ -45,6 +53,7 @@ class InvoiceForm extends Component
     public $tax_amount = 0;
     public $total_amount = 0;
     public $due_amount = 0;
+    public $company;
     
     protected $rules = [
         'invoice_number' => 'required|unique:invoices,invoice_number',
@@ -84,11 +93,28 @@ class InvoiceForm extends Component
         $this->customers = Customers::orderBy('id')->get();
         $this->orders = OrderRequest::orderBy('id')->get();
         $this->availableProducts = Product::with('unit')->get();
-
+        $this->company = Company::first();
         if ($invoiceId) {
             $this->loadInvoice($invoiceId);
+
+             // Load taxes from taxables table
+            $invoice = Invoice::with('taxables')->find($invoiceId);
+            $this->total_amount = $this->invoice->total_amount;
+            $this->due_amount = $this->invoice->due_amount;
+
+            $this->taxes = TaxSetting::where('is_active', true)->get();
+            foreach ($this->taxes as $tax) {
+                $matched = $invoice->taxables->firstWhere('tax_name', $tax->name);
+                $this->selectedTaxes[$tax->name] = $matched ? true : false;
+                $this->taxValues[$tax->name] = $matched ? $matched->rate : $tax->rate; // use stored rate or default
+            }
         } else {
-            $this->invoice_number = 'INV-' . time();
+            $this->taxes = TaxSetting::where('is_active', true)->get();
+
+            foreach ($this->taxes as $tax) {
+                $this->selectedTaxes[$tax->name] = false; // initially unselected
+                $this->taxValues[$tax->name] = $tax->rate; // default from DB
+            }
             $this->addItem();
         }
     }
@@ -113,6 +139,7 @@ class InvoiceForm extends Component
         $this->currency = $this->invoice->currency;
         $this->paid_amount = $this->invoice->paid_amount;
 
+        $this->invoiceType = $this->invoice->is_locked == true ? 'final' : $this->invoice->type;
         // Load invoice items
         $this->invoiceItems = [];
         foreach ($this->invoice->items as $item) {
@@ -122,16 +149,19 @@ class InvoiceForm extends Component
                 'product_code' => $item->product->product_code ?? '',
                 'product_id' => $item->product_id,
                 'product_name' => $item->product->name ?? '',
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-                'total' => $item->total,
+                'quantity' => (int) $item->quantity, // Cast to integer
+                'price' => (float) $item->price, // Cast to float
+                'total' => (float) $item->total, // Cast to float
                 'discount_type' => $item->discount_type ?? 'fixed',
-                'discount' => $item->discount ?? 0,
-                'tax_percentage' => $item->tax_percentage ?? 0,
-                'tax_amount' => $item->tax_amount ?? 0,
-                'net_total' => $item->net_total ?? 0,
-                'available_stock' => $item->product->available_stock ?? 0,
+                'discount' => $item->discount_type == 'percentage' ? (float) $item->discount : 0, // Cast to float
+                'discount_amount' => (float) $item->discount_amount ?? 0, // Cast to float
+                'tax_percentage' => (float) $item->tax_percentage ?? 0, // Cast to float
+                'tax_amount' => (float) $item->tax_amount ?? 0, // Cast to float
+                'net_total' => (float) $item->net_total ?? 0, // Cast to float
+                'available_stock' => (int) $item->product->currentStock(), // Cast to integer
+                'price_after_tax' => (float) $item->price_after_tax ?? 0, // Cast to float
             ];
+            
         }
 
         // After loading, recalculate totals
@@ -174,7 +204,7 @@ class InvoiceForm extends Component
             $this->invoiceItems[$index]['product_name'] = $item->product->name;
             $this->invoiceItems[$index]['quantity'] = $item->quantity;
             $this->invoiceItems[$index]['price'] = $item->product->selling_price;
-            $this->invoiceItems[$index]['available_stock'] = $item->product->available_stock;
+            $this->invoiceItems[$index]['available_stock'] = $item->product->currentStock();
             $this->invoiceItems[$index]['total'] = $item->quantity * $item->product->selling_price;
             $this->invoiceItems[$index]['tax_percentage'] = $item->product->gst_percentage;
             $this->calculateItemTotal($index);
@@ -189,18 +219,13 @@ class InvoiceForm extends Component
         $product = Product::find($productId);
         if ($product) {
             // Get available stock
-            $stockIn = Stock::where('product_id', $productId)
-                ->where('type', 'in')
-                ->sum('quantity');
-            $stockOut = Stock::where('product_id', $productId)
-                ->where('type', 'out')
-                ->sum('quantity');
-            $availableStock = $stockIn - $stockOut;
+            $availableStock = Stock::where('product_id', $product->id)->first();
+            // dd($availableStock->current_stock);
             
             $this->invoiceItems[$index]['product_id'] = $product->id;
             $this->invoiceItems[$index]['product_name'] = $product->name;
             $this->invoiceItems[$index]['price'] = $product->selling_price;
-            $this->invoiceItems[$index]['available_stock'] = $availableStock;
+            $this->invoiceItems[$index]['available_stock'] = $availableStock->current_stock;
             // $this->invoiceItems[$index]['hsn_code'] = $product->hsn_code;
             $this->invoiceItems[$index]['tax_percentage'] = $product->gst_percentage;
             
@@ -238,6 +263,16 @@ class InvoiceForm extends Component
     {
         $this->calculateDueAmount();
     }
+
+    public function updatedSelectedTaxes()
+    {
+        $this->calculateInvoice();
+    }
+
+    public function updatedTaxValues()
+    {
+        $this->calculateInvoice();
+    }
     
     public function calculateItemTotal($index)
     {
@@ -274,24 +309,52 @@ class InvoiceForm extends Component
         $this->invoiceItems[$index]['discount_amount'] = $discountAmount;
         $this->invoiceItems[$index]['tax_percentage'] = $gstPercentage;
         $this->invoiceItems[$index]['tax_amount'] = $tax;
-        $this->invoiceItems[$index]['price_after_tax_and_discount'] = $priceAfterTax;
+        $this->invoiceItems[$index]['price_after_tax'] = $priceAfterTax;
         $this->invoiceItems[$index]['net_total'] = $afterDiscount + $tax;
         
         $this->calculateInvoice();
     }
+
+    public function calculateTax($taxName)
+    {
+        // If not selected, return 0
+        if (!($this->selectedTaxes[$taxName] ?? false)) {
+            return 0;
+        }
+        
+        // Tax rate
+        $rate = $this->taxValues[$taxName] ?? 0;
+
+        // Subtotal after discount
+        $baseAmount = $this->subtotal;
+
+        // Apply global discount to the base
+        if ($this->discount > 0) {
+            $discount = $this->discount_type == 'percentage'
+                ? ($baseAmount * $this->discount / 100)
+                : $this->discount;
+
+            $baseAmount -= $discount;
+        }
+
+        // Calculate tax amount
+        return ($baseAmount * $rate) / 100;
+    }
+
     
     public function calculateInvoice()
     {
         $this->subtotal = 0;
         $itemTaxTotal = 0;
-        
+    
+        // 1. Calculate subtotal from items
         foreach ($this->invoiceItems as $item) {
             if (!empty($item['net_total'])) {
-                $this->subtotal += $item['total'] - ($item['discount'] ?? 0) + ($item['tax_amount'] ?? 0);  // Add $item['tax_amount'];
+                $this->subtotal += $item['net_total'];
             }
         }
-        
-        // Calculate global discount
+    
+        // 2. Calculate global discount
         $globalDiscount = 0;
         if ($this->discount > 0) {
             if ($this->discount_type == 'percentage') {
@@ -300,18 +363,35 @@ class InvoiceForm extends Component
                 $globalDiscount = $this->discount;
             }
         }
-        
-        // Calculate global tax
+    
+        // 3. Calculate global tax (loop through selected taxes)
         $globalTax = 0;
-        if ($this->tax_percentage > 0) {
-            $globalTax = (($this->subtotal - $globalDiscount)) / 100;
+        if (!empty($this->selectedTaxes)) {
+            foreach ($this->selectedTaxes as $taxName => $isSelected) {
+                if ($isSelected) {
+                    $rate = $this->taxValues[$taxName] ?? 0;
+                    $globalTax += (($this->subtotal - $globalDiscount) * $rate) / 100;
+
+                   // Ensure tax is added only once
+                    if (!in_array($taxName, array_column($this->taxablesData, 'tax_name'))) {
+                        $this->taxablesData[] = [
+                            'tax_setting_id' => TaxSetting::where('name', $taxName)->value('id'),
+                            'tax_name' => $taxName,
+                            'rate' => $rate,
+                            'amount' => $globalTax,
+                        ];
+                    }
+                }
+            }
         }
-        
+    
+        // 4. Final amounts
         $this->tax_amount = $itemTaxTotal + $globalTax;
         $this->total_amount = $this->subtotal - $globalDiscount + $this->tax_amount;
-        
+    
         $this->calculateDueAmount();
     }
+    
     
     public function calculateDueAmount()
     {
@@ -329,70 +409,264 @@ class InvoiceForm extends Component
             
             // Check if items have sufficient stock
             foreach ($this->invoiceItems as $index => $item) {
-                $stockIn = Stock::where('product_id', $item['product_id'])
-                    ->where('type', 'in')
-                    ->sum('quantity');
-                $stockOut = Stock::where('product_id', $item['product_id'])
-                    ->where('type', 'out')
-                    ->sum('quantity');
-                $availableStock = $stockIn - $stockOut;
-                
-                if ($item['quantity'] > $availableStock) {
-                    $product = Product::find($item['product_id']);
-                    $this->addError('invoiceItems.' . $index . '.quantity', 
-                        "Insufficient stock for {$product->name}. Available: {$availableStock}");
-                    return;
+                $product = Product::find($item['product_id']);
+                $availableStock = $product->currentStock();
+                // dd($availableStock);
+                // Get the existing item if editing
+                $existingItem = isset($item['id']) ? InvoiceItem::find($item['id']) : null;
+
+                if ($existingItem) {
+                    // Editing existing item
+                    $reversedStock = $existingItem->quantity; // Add back old quantity
+                    $requiredStock = $item['quantity']; // New required
+                    $finalStock = $availableStock + $reversedStock; // stock after reversal
+                    // dd($reversedStock, $requiredStock, $availableStock, $finalStock);
+
+                    if ($requiredStock > $finalStock) {
+                        $this->addError('invoiceItems.' . $index . '.quantity', 
+                            "Insufficient stock for {$product->name}. Available: {$finalStock}");
+                        return;
+                    }
+                } else {
+                    // New item
+                    if ($item['quantity'] > $availableStock) {
+                        $this->addError('invoiceItems.' . $index . '.quantity', 
+                            "Insufficient stock for {$product->name}. Available: {$availableStock}");
+                        return;
+                    }
                 }
+
             }
         }
         
         $this->currentStep++;
     }
-    
+                    
     public function prevStep()
     {
         $this->currentStep--;
     }
     
+    // public function createInvoice()
+    // {
+    //     // $this->validate();
+    //     // dd($this->invoiceItems);
+    //     DB::beginTransaction();
+    //     try {
+    //         // Create invoice
+    //         // $status = $this->paid_amount >= $this->total_amount ? 'paid' : 
+    //         //          ($this->paid_amount > 0 ? 'partial' : 'unpaid');
+            
+    //         $invoice = Invoice::updateOrCreate(
+    //             ['id' => $this->invoiceId ?? null],
+    //             [
+    //                 'customer_id' => $this->customer_id,
+    //                 'total_amount' => $this->total_amount,
+    //                 'discount_type' => $this->discount_type,
+    //                 'discount' => $this->discount,
+    //                 'tax_type' => $this->tax_type,
+    //                 'tax_percentage' => $this->tax_percentage,
+    //                 'tax_amount' => $this->tax_amount,
+    //                 'subtotal' => $this->subtotal,
+    //                 // 'paid_amount' => $this->paid_amount,
+    //                 'due_amount' => $this->due_amount,
+    //                 'invoice_date' => $this->invoice_date,
+    //                 'type' => $this->invoiceType,
+    //                 'is_locked' => $this->invoiceType == 'locked' ? true : false,
+    //                 // 'status' => $status,
+    //                 'notes' => $this->notes,
+    //                 // 'currency' => $this->currency,
+    //                 'payment_method' => $this->payment_method,
+    //                 'seller_id' => Auth::id(),
+    //             ]
+    //         );            
+    //         // 2. If editing, revert previous stock first
+    //         if ($this->invoiceId && $this->invoiceType == 'locked') {
+    //             foreach ($invoice->items as $oldItem) {
+    //                 $product = Product::find($oldItem->product_id);
+    //                 $product->stockIn($oldItem->quantity, $invoice, 'Revert previous invoice stock');
+    //             }
+    //             $invoice->items()->delete(); // Remove old items
+    //         }
+
+    //         // 3. Insert new items and deduct stock
+    //         foreach ($this->invoiceItems as $item) {
+    //             $invoiceItem = InvoiceItem::create([
+    //                 'invoice_id' => $invoice->id,
+    //                 'product_id' => $item['product_id'],
+    //                 'quantity' => $item['quantity'],
+    //                 'price' => $item['price'],
+    //                 'total' => $item['total'],
+    //                 'discount_type' => $item['discount_type'] ?? 'fixed',
+    //                 'discount' => $item['discount_type'] == 'percentage' ? $item['discount'] : 0,
+    //                 'discount_amount' => $item['discount_amount'] ?? 0,
+    //                 'tax_percentage' => floatval($item['tax_percentage'] ?? 0),
+    //                 'tax_amount' => $item['tax_amount'] ?? 0,
+    //                 'price_after_tax' => $item['price_after_tax'] ?? 0,
+    //                 'net_total' => $item['net_total'],
+    //             ]);
+
+    //             if ($this->invoiceType == 'locked') {
+    //                 $product = Product::find($item['product_id']);
+    //                 $product->stockOut($item['quantity'], $invoice, 'Invoice deduction');
+    //             }
+    //         }
+
+    //         DB::commit();            
+    //         $this->invoice = $invoice;
+    //         $invoice->load('customer', 'items.product.unit');
+    //         if($this->invoiceType == 'draft')
+    //         {
+    //             return redirect()->route('invoices.index')->with('success', 'Invoice created successfully as a draft.');
+    //         }
+    //         elseif($this->invoiceType == 'quotation')
+    //         {
+    //             return redirect()->route('invoices.index')->with('success', 'Invoice created successfully as a quotation.');
+    //         }
+    //         elseif($this->invoiceType == 'locked')
+    //         {
+    //             $this->currentStep = 3;
+    //         }
+            
+    //     } catch (\Exception $e) {
+    //         dd($e);
+    //         DB::rollBack();
+    //         $this->addError('general', 'Failed to create invoice: ' . $e->getMessage());
+    //     }
+    // }
+
     public function createInvoice()
     {
         // $this->validate();
-        // dd($this->invoiceItems);
         DB::beginTransaction();
         try {
-            // Create invoice
-            $status = $this->paid_amount >= $this->total_amount ? 'paid' : 
-                     ($this->paid_amount > 0 ? 'partial' : 'unpaid');
+            // Store original invoice for comparison if we're updating
+            $originalInvoice = null;
+            if ($this->invoiceId) {
+                $originalInvoice = Invoice::with('items')->find($this->invoiceId);
+            }
             
+            // Create or update invoice
             $invoice = Invoice::updateOrCreate(
                 ['id' => $this->invoiceId ?? null],
                 [
-                    'invoice_number' => $this->invoice_number,
                     'customer_id' => $this->customer_id,
                     'total_amount' => $this->total_amount,
                     'discount_type' => $this->discount_type,
                     'discount' => $this->discount,
-                    'tax_type' => $this->tax_type,
-                    'tax_percentage' => $this->tax_percentage,
                     'tax_amount' => $this->tax_amount,
                     'subtotal' => $this->subtotal,
-                    'paid_amount' => $this->paid_amount,
                     'due_amount' => $this->due_amount,
                     'invoice_date' => $this->invoice_date,
                     'type' => $this->invoiceType,
-                    'is_locked' => $this->invoiceType == 'final' ? true : false,
-                    'status' => $status,
+                    'is_locked' => $this->invoiceType == 'locked' ? true : false,
                     'notes' => $this->notes,
-                    'currency' => $this->currency,
                     'payment_method' => $this->payment_method,
                     'seller_id' => Auth::id(),
                 ]
-            );            
-            // Create invoice items
-            foreach ($this->invoiceItems as $item) {
-                InvoiceItem::updateOrCreate(
-                    ['id' => $item['id'] ?? null], // Update if id exists
-                    [
+            );
+
+            // Clear existing taxables if updating
+            $invoice->taxables()->delete();
+
+            // Store new taxables
+            foreach ($this->taxablesData as $data) {
+                $invoice->taxables()->create($data);
+            }
+            // Process stock adjustments only for locked invoices
+            if ($this->invoiceType == 'locked') {
+                // dd($this->invoiceItems);
+                // If editing an existing locked invoice, handle stock adjustment differences
+                if ($originalInvoice && $originalInvoice->type == 'locked') {
+                    // Create a map of original items for easy comparison
+                    $originalItems = [];
+                    foreach ($originalInvoice->items as $item) {
+                        $originalItems[$item->product_id] = $item;
+                    }
+                    // dd($originalItems, 444);
+                    // Delete old items - we'll recreate them all
+                    $invoice->items()->delete();
+                    
+                    // Process each new item
+                    foreach ($this->invoiceItems as $item) {
+                        // Create the new invoice item
+                        $invoiceItem = InvoiceItem::create([
+                            'invoice_id' => $invoice->id,
+                            'product_id' => $item['product_id'],
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price'],
+                            'total' => $item['total'],
+                            'discount_type' => $item['discount_type'] ?? 'fixed',
+                            'discount' => $item['discount_type'] == 'percentage' ? $item['discount'] : 0,
+                            'discount_amount' => $item['discount_amount'] ?? 0,
+                            'tax_percentage' => floatval($item['tax_percentage'] ?? 0),
+                            'tax_amount' => $item['tax_amount'] ?? 0,
+                            'price_after_tax' => $item['price_after_tax'] ?? 0,
+                            'net_total' => $item['net_total'],
+                        ]);
+                        
+                        $product = Product::find($item['product_id']);
+                        
+                        // Check if this product was in the original invoice
+                        if (isset($originalItems[$item['product_id']])) {
+                            $originalQty = $originalItems[$item['product_id']]->quantity;
+                            $newQty = $item['quantity'];
+                            // Calculate the difference in quantity
+                            $qtyDifference = $newQty - $originalQty;
+                            // Only adjust stock if there's a difference
+                            if ($qtyDifference != 0) {
+                                if ($qtyDifference > 0) {
+                                    // Additional items sold - need to decrease stock
+                                    $product->stockOut($qtyDifference, $invoice, 'Invoice update - additional items');
+                                } else {
+                                    // Fewer items sold - need to increase stock
+                                    $product->stockIn(abs($qtyDifference), $invoice, 'Invoice update - returned items');
+                                }
+                            }
+                            
+                            // Remove from original items array to track what was processed
+                            unset($originalItems[$item['product_id']]);
+                        } else {
+                            // This is a new product added to the invoice
+                            $product->stockOut($item['quantity'], $invoice, 'Invoice update - new product added');
+                        }
+                    }
+                    
+                    // Any items left in originalItems array were removed from the invoice
+                    foreach ($originalItems as $productId => $item) {
+                        $product = Product::find($productId);
+                        // Return stock for products no longer on the invoice
+                        $product->stockIn($item->quantity, $invoice, 'Invoice update - product removed');
+                    }
+                } else {
+                    // New locked invoice - simply deduct stock for all items
+                    foreach ($this->invoiceItems as $item) {
+                        // Create the invoice item
+                        $invoiceItem = InvoiceItem::create([
+                            'invoice_id' => $invoice->id,
+                            'product_id' => $item['product_id'],
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price'],
+                            'total' => $item['total'],
+                            'discount_type' => $item['discount_type'] ?? 'fixed',
+                            'discount' => $item['discount_type'] == 'percentage' ? $item['discount'] : 0,
+                            'discount_amount' => $item['discount_amount'] ?? 0,
+                            'tax_percentage' => floatval($item['tax_percentage'] ?? 0),
+                            'tax_amount' => $item['tax_amount'] ?? 0,
+                            'price_after_tax' => $item['price_after_tax'] ?? 0,
+                            'net_total' => $item['net_total'],
+                        ]);
+                        
+                        // Deduct stock
+                        $product = Product::find($item['product_id']);
+                        $product->stockOut($item['quantity'], $invoice, 'Invoice creation - item sold');
+                    }
+
+                }
+            } else {
+                // For non-locked invoices (draft or quotation), just create items without stock adjustments
+                foreach ($this->invoiceItems as $item) {
+                    $invoiceItem = InvoiceItem::create([
                         'invoice_id' => $invoice->id,
                         'product_id' => $item['product_id'],
                         'quantity' => $item['quantity'],
@@ -403,59 +677,32 @@ class InvoiceForm extends Component
                         'discount_amount' => $item['discount_amount'] ?? 0,
                         'tax_percentage' => floatval($item['tax_percentage'] ?? 0),
                         'tax_amount' => $item['tax_amount'] ?? 0,
-                        'price_after_tax_and_discount' => $item['price_after_tax_and_discount'] ?? 0,
+                        'price_after_tax' => $item['price_after_tax'] ?? 0,
                         'net_total' => $item['net_total'],
-                    ]
-                );
-                if($this->invoiceType == 'final')
-                {
-                    // Update stock
-                    Stock::create([
-                        'product_id' => $item['product_id'],
-                        'quantity' => $item['quantity'],
-                        'type' => 'out',
-                        'stock_type' => 'sale',
-                        'reference_id' => $invoice->id,
-                        'date' => now(),
-                        'note' => 'Invoice #' . $invoice->invoice_number,
                     ]);
                 }
             }
 
-            if(!$this->invoiceId && $this->invoiceType == 'final')
-            {
-                $payment = Payment::create([
-                    'invoice_id' => $invoice->id,
-                    'amount' => $this->paid_amount,
-                    'payment_method' => $this->payment_method,
-                    'payment_date' => now(),
-                    'status' => 'completed',
-                    'notes' => $this->notes,
-                    'created_by' => Auth::id()               
-                ]);
-            }
-            
-            DB::commit();
-            
+            DB::commit();            
             $this->invoice = $invoice;
             $invoice->load('customer', 'items.product.unit');
-            if($this->invoiceType == 'draft')
-            {
+            
+            if ($this->invoiceType == 'draft') {
                 return redirect()->route('invoices.index')->with('success', 'Invoice created successfully as a draft.');
-            }
-            elseif($this->invoiceType == 'quotation')
-            {
+            } elseif ($this->invoiceType == 'quotation') {
                 return redirect()->route('invoices.index')->with('success', 'Invoice created successfully as a quotation.');
-            }
-            elseif($this->invoiceType == 'final')
-            {
+            } elseif ($this->invoiceType == 'locked') {
                 $this->currentStep = 3;
             }
             
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
             $this->addError('general', 'Failed to create invoice: ' . $e->getMessage());
+            // Log the error for debugging
+            \Log::error('Invoice creation error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
     
@@ -479,7 +726,6 @@ class InvoiceForm extends Component
         ]);
         
         $this->invoice_date = Carbon::now()->format('Y-m-d');
-        $this->invoice_number = 'INV-' . time();
         $this->addItem();
         $this->currentStep = 1;
     }

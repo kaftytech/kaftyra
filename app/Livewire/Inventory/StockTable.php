@@ -9,7 +9,7 @@ class StockTable extends Component
 {
     public function render()
     {
-        $stocks = Stock::paginate(10);
+        $stocks = Stock::orderBy('id', 'desc')->paginate(10);
 
         return view('livewire.inventory.stock-table', compact('stocks'));
     }

@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
-            $table->date('adjustment_date');
-            $table->enum('adjustment_type', ['increase', 'decrease']); // addition or subtraction
-            $table->string('reason')->nullable(); // Reason for adjustment (e.g., damaged, lost, etc.)
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->morphs('adjustable');
+            $table->enum('type', ['in', 'out'])->default('in');
+            $table->date('date');
+            $table->foreignId('performed_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('branch_id')->nullable()->constrained('branches')->nullOnDelete();
+            $table->string('note')->nullable();
             $table->timestamps();
         });
     }

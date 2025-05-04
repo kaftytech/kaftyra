@@ -24,4 +24,35 @@ class OrderRequest extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
+
+    protected static function booted()
+    {
+        parent::boot();
+
+        static::creating(function ($orderRequest) {
+            $setting = PrefixSetting::where('prefix_for', 'OrderRequest')->first();
+    
+            $number = str_pad($setting->current_number, 5, '0', STR_PAD_LEFT);
+    
+            $suffix = $setting->suffix ?? '';
+            $parts = [];
+
+            if ($setting->prefix) {
+                $parts[] = $setting->prefix;
+            }
+
+            if ($suffix) {
+                $parts[] = $suffix;
+            }
+
+            if ($number) {
+                $parts[] = $number;
+            }
+
+            $orderRequest->order_id = implode('-', $parts);
+    
+            // Increment the current number
+            $setting->increment('current_number');
+        });
+    }
 }

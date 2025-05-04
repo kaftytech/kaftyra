@@ -22,6 +22,8 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignId('converted_invoice_id')->nullable()->constrained('invoices')->onDelete('cascade');
             $table->foreignId('branch_id')->nullable()->constrained('branches')->nullOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

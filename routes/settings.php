@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Settings\TaxSettingController;
+use App\Http\Controllers\Settings\SettingController;
 
 Route::group(['prefix' => 'company'], function() {
     Route::get('/', [CompanyController::class, 'index'])->name('company.index');
@@ -11,3 +13,8 @@ Route::group(['prefix' => 'company'], function() {
     Route::post('/{company}', [CompanyController::class, 'update'])->name('company.update');
     Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('company.destroy');
 });
+
+Route::resource('tax', TaxSettingController::class);
+
+Route::get('prefix-setting', [SettingController::class, 'prefixSetting'])->name('prefix-setting');
+

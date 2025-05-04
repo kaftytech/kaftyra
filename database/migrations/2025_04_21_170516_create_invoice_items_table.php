@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('discount_amount', 10, 2)->default(0); // discount on the item          
             $table->decimal('tax_percentage', 10, 2)->nullable(); 
             $table->decimal('tax_amount', 10, 2)->default(0); // tax on the item            
-            $table->decimal('price_after_tax_and_discount', 10, 2); // price + tax
+            $table->decimal('price_after_tax', 10, 2); // price + tax
             $table->decimal('net_total', 10, 2); // total - discount + tax
             $table->timestamps();
             $table->softDeletes(); // For soft delete functionality

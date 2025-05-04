@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center p-4 border-b">
             <h4 class="font-medium text-gray-700">Leads</h4>
             <div class="flex space-x-2">
-              <livewire:filter.filter-component entity-type="leads" />              
+                         
               <button class="bg-blue-600 text-white py-1 px-3 rounded text-sm hover:bg-blue-700">
                 <a href="{{route('leads.create')}}">
                   <i class="fas fa-plus mr-1"></i> Add

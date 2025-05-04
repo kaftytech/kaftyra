@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('used_amount', 10, 2)->default(0); // amount used from the credit note
             $table->decimal('opening_balance', 10, 2)->default(0); // opening balance of the credit note
             $table->decimal('closing_balance', 10, 2)->default(0); // closing balance of the credit note
+            $table->string('note')->nullable();
+            $table->foreignId('applied_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

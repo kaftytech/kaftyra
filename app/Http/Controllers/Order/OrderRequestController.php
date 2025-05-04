@@ -18,11 +18,15 @@ class OrderRequestController extends Controller
     public function create()
     {
         // Logic to show the form for creating a new order request
+        return view('orders.request.create');  
+
     }
 
     public function edit($id)
     {
         // Logic to show the form for editing an existing order request
+        $order = OrderRequest::findOrFail($id);
+        return view('orders.request.edit', compact('order'));
     }
 
     public function show($id)

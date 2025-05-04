@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class CreditNoteUsage extends Model
 {
-    //
+    protected $guarded = [];
 }

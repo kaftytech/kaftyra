@@ -51,7 +51,19 @@
             <div class="flex-1 flex flex-col">
                 <!-- Navbar -->
                 @include('layouts.navbar')
-                
+                @if (session('success'))
+                    <x-message type="success" :message="session('success')" />
+                @endif
+
+                @if (session('error'))
+                    <x-message type="error" :message="session('error')" />
+                @endif
+
+                @if (session('warning'))
+                    <x-message type="warning" :message="session('warning')" />
+                @endif
+
+
                 <!-- Page Content -->
                 <main class="flex-1 px-4 sm:px-6 lg:px-4 py-6 overflow-y-auto">
                     @yield('content')

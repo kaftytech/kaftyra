@@ -6,6 +6,7 @@ use App\Http\Controllers\Inventory\CategoryController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\StockController;
 use App\Http\Controllers\Inventory\VendorController;
+use App\Http\Controllers\Inventory\PurchaseOrderController;
 
 
 Route::group(['prefix' => 'units'], function() {
@@ -60,4 +61,14 @@ Route::group(['prefix' => 'vendors'], function() {
     Route::get('/{vendor}/edit', [VendorController::class, 'edit'])->name('vendors.edit');
     Route::post('/{vendor}', [VendorController::class, 'update'])->name('vendors.update');
     Route::delete('/{vendor}', [VendorController::class, 'destroy'])->name('vendors.destroy');
+});
+
+Route::group(['prefix' => 'purchase-orders'], function() {
+    Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchase-orders.index');
+    Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase-orders.create');
+    Route::post('/', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
+    Route::get('/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->name('purchase-orders.show');
+    Route::get('/{purchaseOrder}/edit', [PurchaseOrderController::class, 'edit'])->name('purchase-orders.edit');
+    Route::post('/{purchaseOrder}', [PurchaseOrderController::class, 'update'])->name('purchase-orders.update');
+    Route::delete('/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])->name('purchase-orders.destroy');
 });

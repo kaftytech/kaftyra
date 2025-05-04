@@ -19,9 +19,11 @@ return new class extends Migration
             $table->decimal('price', 10, 2); // per unit price (without tax)
             $table->enum('discount_type', ['percentage', 'fixed','free']);
             $table->decimal('discount', 8, 2)->nullable();
+            $table->decimal('discount_amount', 8, 2)->nullable();
             $table->string('tax_percentage')->nullable();
             $table->decimal('tax_amount', 10, 2)->default(0); // per unit tax
-            $table->decimal('total', 10, 2); // (price + tax) × quantity
+            $table->decimal('price_after_tax', 10, 2); // price + tax
+            $table->decimal('net_total', 10, 2); // total - discount + tax
             $table->text('reason')->nullable();
             $table->timestamps();
             $table->softDeletes();

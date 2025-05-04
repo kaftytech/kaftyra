@@ -25,7 +25,6 @@ class ProductReturnForm extends Component
     public $total_amount = 0;
     public $status = 'pending';
     public $reason;
-    public $isAddingDiscountAndTax = false;
 
     public $returnItems = [];
     public $invoices = [];
@@ -48,6 +47,7 @@ class ProductReturnForm extends Component
                     'id' => $item->id,
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
+                    'original_quantity' => $item->quantity,
                     'price' => $item->price,
                     'discount_type' => $item->discount_type,
                     'discount' => $item->discount,
@@ -70,6 +70,7 @@ class ProductReturnForm extends Component
         $this->returnItems[] = [
             'product_id' => '',
             'quantity' => 1,
+            'original_quantity' => 1,
             'price' => 0,
             'discount_type' => 'percentage',
             'discount' => null,
@@ -96,7 +97,6 @@ class ProductReturnForm extends Component
         $this->returnItems = []; 
         $this->addReturnItem();
         $this->calculateTotals();
-        $this->isAddingDiscountAndTax = false;
         $this->customer_id = null;
         $this->invoice_id = null;
     }
@@ -123,12 +123,13 @@ class ProductReturnForm extends Component
             $this->returnItems[$index]['product_id'] = $item->product->id;
             $this->returnItems[$index]['product_name'] = $item->product->name;
             $this->returnItems[$index]['quantity'] = $item->quantity;
+            $this->returnItems[$index]['original_quantity'] = $item->quantity;
             $this->returnItems[$index]['price'] = $item->price;
-            $this->returnItems[$index]['total'] = $item->quantity * $item->price;
+            $this->returnItems[$index]['total'] = $item->net_total;
             $this->returnItems[$index]['tax_percentage'] = $item->tax_percentage;
             $this->returnItems[$index]['tax_amount'] = $item->tax_amount;
             $this->returnItems[$index]['discount_type'] = $item->discount_type;
-            $this->returnItems[$index]['discount'] = $item->discount;
+            $this->returnItems[$index]['discount'] = $item->discount_type == 'percentage' ? $item->discount : $item->discount_amount;
             $this->returnItems[$index]['discount_amount'] = $item->discount_amount;
             $this->calculateItemTotals($index);
 
@@ -156,39 +157,44 @@ class ProductReturnForm extends Component
         foreach ($this->returnItems as $index => &$item) {
             $price = $item['price'];
             $quantity = $item['quantity'];
+            $OriginalQuantity = $item['original_quantity'];
             $discountType = $item['discount_type'];
             $total = $price * $quantity;
-            
+            $afterDiscount = $total;
+            $discountAmount = 0;
             // If $isAddingDiscountAndTax is true, apply the discount and tax calculations
-            if ($this->isAddingDiscountAndTax) {
-                // Apply discount based on type
-                if ($discountType == 'percentage') {
-                    $discount = (float)($item['discount'] ?? 0);  // Ensure it's a float
-                    // dd($total, $discount);
+            // if ($this->isAddingDiscountAndTax) {
+            // Apply discount based on type
+            if ($discountType == 'percentage') {
+                $discount = (float)($item['discount'] ?? 0);  // Ensure it's a float
+                // dd($total, $discount);              
+                $discountRate = floatval($item['discount'] ?? 0); // e.g., 10 for 10%
+                $discountPerUnit = ($price * $discountRate) / 100;
+                $discountPricePerUnit = $price - $discountPerUnit;
+                $afterDiscount = $discountPricePerUnit * $quantity;
+                $discountAmount = $discountPerUnit * $quantity;
                 
-                    $item['discount'] = ($total * $discount) / 100;  // Apply the discount
-                    // dd($item['discount']);
-                }
-                 elseif ($discountType == 'fixed') {
-                    $item['discount'] = $item['discount'] ?? 0;
-                } else {
-                    $item['discount'] = 0;
-                }
-    
-                // Apply GST (tax) calculation
-                $afterDiscount = $total - $item['discount'];
-                $gstPercentage = !empty($item['tax_percentage']) ? floatval($item['tax_percentage']) : 0;
-                $tax = ($total * $gstPercentage) / 100; // GST tax calculation
-                $item['tax_amount'] = $tax;
-    
-                // Calculate total after applying discount and tax
-                $item['total'] = ($afterDiscount + $tax); // After discount + tax
+                // dd($item['discount']);
+            } elseif ($discountType == 'fixed') {
+                // dd($item['discount']);
+                $discountPerUnit = $item['discount'] / $OriginalQuantity;
+                $discountPricePerUnit = $price - $discountPerUnit;
+                $afterDiscount = $discountPricePerUnit * $quantity;
+                $discountAmount = $discountPerUnit * $quantity;
+                // $item['total'] = $totalDiscount;
+                // dd($DiscountperUnit,$item['discount']);
             } else {
-                // If $isAddingDiscountAndTax is false, simply calculate the total without discounts and taxes
                 $item['discount'] = 0;
-                $item['tax_amount'] = 0;
-                $item['total'] = $price * $quantity; // Just price * quantity
             }
+
+            // Apply GST (tax) calculation
+            $item['discount_amount'] = $discountAmount;
+            $gstPercentage = !empty($item['tax_percentage']) ? floatval($item['tax_percentage']) : 0;
+            $tax = ($total * $gstPercentage) / 100; // GST tax calculation
+            $item['tax_amount'] = $tax;
+
+            // Calculate total after applying discount and tax
+            $item['total'] = ($afterDiscount + $tax);
         }
         unset($item);
     
@@ -243,6 +249,7 @@ class ProductReturnForm extends Component
                     'total' => $item['total'],
                     'discount_type' => $item['discount_type'] ?? 'fixed',
                     'discount' => $item['discount_type'] == 'percentage' ? $item['discount'] : 0,
+                    'discount_amount' => $item['discount_amount'],
                     'tax_percentage' => floatval($item['tax_percentage'] ?? 0),
                     'tax_amount' => $item['tax_amount'] ?? 0,
                     'total' => $item['total'] ?? 0,

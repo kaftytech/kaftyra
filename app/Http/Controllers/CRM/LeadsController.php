@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Leads;
 use App\Models\Customers;
 use App\Models\Vendors;
-
+use App\Notifications\LeadNotification;
+use App\Notifications\CustomerNotification;
+use App\Models\User;
 class LeadsController extends Controller
 {
     public function index()
@@ -36,6 +38,13 @@ class LeadsController extends Controller
         // Validate the request data
         // Create a new lead
         $lead = Leads::create($input);
+
+        $usersToNotify = User::whereHas('roles', function ($query) {
+                $query->where('name', ['admin', 'store_keeper']);
+            })->get();
+        foreach ($usersToNotify as $user) {
+            $user->notify(new LeadNotification($lead));
+        }
         return redirect()->route('leads.index')->with('success', 'Lead created successfully.');
     }
 
@@ -63,24 +72,44 @@ class LeadsController extends Controller
     public function convert(Leads $lead, $type)
     {
         if ($type === 'customer') {
-            Customers::create([
+            $customer = Customers::create([
                 'customer_name' => $lead->name,
                 'email' => $lead->email,
                 'phone' => $lead->phone
             ]);
+
+            $lead->update(['status' => 'converted', 'customer_id' => $customer->id]);
+
+            $usersToNotify = User::whereHas('roles', function ($query) {
+                    $query->where('name', ['admin', 'store_keeper']);
+                })->get();
+            foreach ($usersToNotify as $user) {
+                $user->notify(new CustomerNotification($customer));
+            }
+
+            return redirect()->back()->with('success', ucfirst($type).' created successfully!');
+
+
         } elseif ($type === 'vendor') {
-            Vendors::create([
+            $vendor = Vendors::create([
                 'company_name' => $lead->company_name ?? $lead->name,
                 'email' => $lead->email,
                 'phone' => $lead->phone
             ]);
+
+            $lead->update(['status' => 'converted', 'vendor_id' => $vendor->id]);
+
+            return redirect()->back()->with('success', ucfirst($type).' created successfully!');
+
         } else {
             return back()->with('error', 'Invalid conversion type.');
         }
-
         // (Optional) Mark lead as "converted"
-        $lead->update(['status' => 'converted']);
 
-        return redirect()->back()->with('success', ucfirst($type).' created successfully!');
+    }
+
+    public function logs(Leads $lead)
+    {
+        return view('crm.leads.logs', compact('lead'));
     }
 }

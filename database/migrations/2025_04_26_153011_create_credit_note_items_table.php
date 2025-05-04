@@ -23,6 +23,7 @@ return new class extends Migration
             $table->decimal('discount_amount', 8, 2)->nullable();
             $table->decimal('tax_percentage', 5, 2)->nullable();
             $table->decimal('tax_amount', 10, 2)->default(0);
+            $table->decimal('price_after_tax', 10, 2); // price + tax
             $table->decimal('net_total', 10, 2); // total - discount + tax
             $table->text('reason')->nullable(); // Reason for returning this item
             $table->timestamps();
