@@ -13,7 +13,9 @@ Route::group(['prefix' => 'company'], function() {
     Route::post('/{company}', [CompanyController::class, 'update'])->name('company.update');
     Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('company.destroy');
 });
-
+Route::group(['prefix' => 'app'], function() {
+    Route::get('/', [SettingController::class, 'appSetting'])->name('app.setting');
+});
 Route::resource('tax', TaxSettingController::class);
 
 Route::get('prefix-setting', [SettingController::class, 'prefixSetting'])->name('prefix-setting');

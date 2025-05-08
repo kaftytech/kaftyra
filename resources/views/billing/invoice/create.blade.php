@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        @livewire('billing.invoice-form')
+        @livewire('billing.invoice-form', ['orderId' => $orderId ?? null])
     </div>
  </div>
 @endsection

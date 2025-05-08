@@ -12,6 +12,11 @@ class SettingController extends Controller
         return view('settings.index');
     }
 
+    public function appSetting()
+    {
+        return view('settings.app.index');
+    }
+
     public function prefixSetting()
     {
         return view('settings.prefix.index');

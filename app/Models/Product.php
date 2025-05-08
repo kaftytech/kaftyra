@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Stock;
+use App\Traits\HasAuditLog;
+
 class Product extends Model
 {
+    use HasAuditLog;
     protected $table = 'products';
     protected $fillable = [
         'name',
@@ -36,6 +39,13 @@ class Product extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+    public function vendors()
+    {
+        return $this->belongsToMany(Vendors::class, 'product_vendors')
+                    ->withPivot('vendor_price')
+                    ->withTimestamps();
+    }
+
 
     public function currentStock($branchId = null)
     {
@@ -150,8 +160,18 @@ class Product extends Model
             
             // Use updateOrCreate to update existing record or create a new one
             $updatedStock = Stock::where('product_id', $this->id)->first();
-            $updatedStock->current_stock = $newQuantity;
-            $updatedStock->save();
+            // dd($newQuantity);
+            if (!$updatedStock) {
+                $updatedStock = new Stock;
+                $updatedStock->product_id = $this->id;
+                $updatedStock->current_stock = $newQuantity;
+                $updatedStock->save();
+            }
+            else
+            {
+                $updatedStock->current_stock = $newQuantity;
+                $updatedStock->save();
+            }
             // dd($updatedStock);
             \Log::info("Stock record updated", [
                 'id' => $updatedStock->id,

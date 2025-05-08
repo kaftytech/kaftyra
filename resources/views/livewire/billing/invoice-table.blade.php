@@ -39,6 +39,9 @@
               <button class="hover:bg-gray-50 text-gray-700 p-2 transition duration-150" wire:click="payment({{$invoice->id}})">
                   <i class="fas fa-money-bill-wave"></i>
               </button>
+              <button class="hover:bg-gray-50 text-gray-700 p-2 transition duration-150" wire:click="shipping({{$invoice->id}})">
+                    <i class="fas fa-truck"></i>
+                </button>
               <button class="ml-2 text-red-600 hover:text-red-900">
                 <i class="fas fa-trash"></i>
               </button>
@@ -175,5 +178,104 @@
         </div>
     </div>
     @endif
+    @if($showShippingModal)
+    <div class="fixed z-50 inset-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 relative">
+    
+            <!-- Background Overlay (Fix applied: absolute + z-index) -->
+            <div class="fixed inset-0 bg-opacity-30 z-40"></div>
+
+            <div class="bg-gray-200 rounded-lg shadow-xl w-full max-w-2xl z-50 p-6 relative">
+                <h2 class="text-xl font-semibold mb-4">Shipping Details</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <div class="mb-3">
+                        <label class="text-sm text-gray-500">Invoice Number</label>
+                        <div class="font-medium text-gray-700">{{ $selectedInvoice->invoice_number ?? '-' }}</div>
+                    </div>
+        
+                    <div class="mb-3">
+                        <label class="text-sm text-gray-500">Customer Name</label>
+                        <div class="font-medium text-gray-700">{{ $selectedInvoice->customer->customer_name ?? '-' }}</div>
+                    </div>
+      
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- <div>
+                        <label class="text-sm text-gray-600">Delivery Date</label>
+                        <input type="date" wire:model.defer="shippingData.delivery_date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-400" />
+                    </div> --}}
+                    <div>
+                        <label class="text-sm text-gray-600">Delivery Type</label>
+                        <select wire:model.live="shippingData.delivery_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="vehicle">Vehicle</option>
+                            <option value="courier">Courier</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Status</label>
+                        <select wire:model.defer="shippingData.status" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="pending">Pending</option>
+                            <option value="packed">Packed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="canceled">Canceled</option>
+                        </select>
+                    </div>
+                    @if($shippingData['delivery_type'] == 'courier')
+                        <div>
+                            <label class="text-sm text-gray-600">Tracking Number</label>
+                            <input type="text" wire:model.defer="shippingData.tracking_number" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+                        </div>
+
+                        <div>
+                            <label class="text-sm text-gray-600">Courier Name</label>
+                            <input type="text" wire:model.defer="shippingData.courier_name" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+                        </div>    
+                    @endif
+
+                    {{-- <div>
+                        <label class="text-sm text-gray-600">Courier Number</label>
+                        <input type="text" wire:model.defer="shippingData.courier_number" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+                    </div> --}}
+                    <div>
+                        <label class="text-sm text-gray-600">Assigned To (Salesman)</label>
+                        <select wire:model.defer="shippingData.assigned_to" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="">Select Salesman</option>
+                            @foreach ($salesmen as $salesman)
+                            <option value="{{ $salesman->id }}">{{ $salesman->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @if($shippingData['delivery_type'] == 'vehicle')
+                    <div>
+                        <label class="text-sm text-gray-600">Vehicle</label>
+                        <select wire:model.defer="shippingData.vehicle_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="">Select Vehicle</option>
+                            @foreach ($vehicles as $vehicle)
+                            <option value="{{ $vehicle->id }}">{{ $vehicle->vehicle_number }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+                    
+                </div>
+
+                <div class="mt-3">
+                    <label class="text-sm text-gray-600">Notes</label>
+                    <textarea wire:model.defer="shippingData.notes" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-4">
+                    <button class="px-4 py-2 bg-gray-200 rounded" wire:click="$set('showShippingModal', false)">Cancel</button>
+                    <button class="px-4 py-2 bg-green-600 text-white rounded" wire:click="storeShipping">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     
 </div>

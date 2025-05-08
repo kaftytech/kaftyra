@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center p-4 border-b">
             <h4 class="font-medium text-gray-700">Category</h4>            
           </div>
-          <form action="{{ isset($category) ? route('categories.update', $category->id) : route('categories.store') }}" method="POST" class="mt-4">
+          {{-- <form action="{{ isset($category) ? route('categories.update', $category->id) : route('categories.store') }}" method="POST" class="mt-4">
             @csrf
         
             <div class="p-4">
@@ -78,8 +78,8 @@
             <div class="mt-4">
               {{ $categories->links() }}
             </div>
-        </div>
-        
+        </div> --}}
+        @livewire('inventory.category-form')
     </div>
  </div>
 @endsection

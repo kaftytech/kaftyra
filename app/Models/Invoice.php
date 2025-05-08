@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasAuditLog;
 
 class Invoice extends Model
 {
+    use HasAuditLog;
+    
     protected $guarded = [];
 
     public function customer()
@@ -66,5 +69,16 @@ class Invoice extends Model
     {
         return $this->morphMany(Taxable::class, 'taxable');
     }
+
+    public function delivery()
+    {
+        return $this->hasOne(Delivery::class);
+    }
+
+    public function signature()
+    {
+        return $this->hasOne(InvoiceSignature::class);
+    }
+
 
 }

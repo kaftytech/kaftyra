@@ -21,8 +21,8 @@
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg p-6 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="stats-container">
+         {{-- <div class="bg-white rounded-lg p-6 shadow-sm">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-gray-500 text-sm font-medium">Total Customers</h3>
             <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">+12%</span>
@@ -72,7 +72,7 @@
               <i class="fas fa-clock"></i>
             </div>
           </div>
-        </div>
+        </div> --}}
       </div>
 
       <!-- Charts -->
@@ -81,9 +81,10 @@
           <div class="flex justify-between items-center mb-6">
             <h3 class="font-semibold text-lg text-gray-800">Revenue Overview</h3>
             <div class="flex items-center space-x-2">
-              <button class="text-sm text-gray-600 hover:text-blue-500">Monthly</button>
-              <button class="text-sm text-blue-500 font-medium">Weekly</button>
-              <button class="text-sm text-gray-600 hover:text-blue-500">Daily</button>
+              <button data-period="monthly" class="revenue-period-btn text-sm text-gray-600 hover:text-blue-500">Monthly</button>
+              <button data-period="weekly" class="revenue-period-btn text-sm text-blue-500 font-medium">Weekly</button>
+              <button data-period="daily" class="revenue-period-btn text-sm text-gray-600 hover:text-blue-500">Daily</button>
+
             </div>
           </div>
           <div>
@@ -95,10 +96,10 @@
           <div class="flex justify-between items-center mb-6">
             <h3 class="font-semibold text-lg text-gray-800">Sales by Category</h3>
             <div class="text-sm text-gray-500">
-              <select class="border-none bg-transparent focus:outline-none">
-                <option>Last 30 days</option>
-                <option>Last 60 days</option>
-                <option>Last 90 days</option>
+              <select id="categoryFilter" class="border-none bg-transparent focus:outline-none">
+                <option value="30">Last 30 days</option>
+                <option value="60">Last 60 days</option>
+                <option value="90">Last 90 days</option>
               </select>
             </div>
           </div>
@@ -245,576 +246,125 @@
           </div>
         </div>
 
-        <!-- Recent Activities -->
         <div class="bg-white p-6 rounded-lg shadow-sm lg:col-span-2">
           <div class="flex justify-between items-center mb-6">
             <h3 class="font-semibold text-lg text-gray-800">Recent Activities</h3>
             <a href="#" class="text-sm text-blue-500 hover:underline">View All</a>
           </div>
-          <div class="space-y-4">
-            <div class="flex items-start">
-              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 mr-4">
-                <i class="fas fa-user-plus"></i>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-800">New lead assigned</p>
-                <p class="text-sm text-gray-600">James Wilson from Acme Corp has been assigned to Sarah</p>
-                <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
-              </div>
-            </div>
-            <div class="flex items-start">
-              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-4">
-                <i class="fas fa-dollar-sign"></i>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-800">New payment received</p>
-                <p class="text-sm text-gray-600">$2,450 received from TechStart Inc. for Invoice #INV-0008</p>
-                <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
-              </div>
-            </div>
-            <div class="flex items-start">
-              <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mr-4">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-800">Low stock alert</p>
-                <p class="text-sm text-gray-600">Smart Watch inventory is below threshold (5 units remaining)</p>
-                <p class="text-xs text-gray-500 mt-1">1 day ago</p>
-              </div>
-            </div>
-            <div class="flex items-start">
-              <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mr-4">
-                <i class="fas fa-user-check"></i>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-800">Lead converted to customer</p>
-                <p class="text-sm text-gray-600">GlobalTech Ltd. has been converted from lead to customer</p>
-                <p class="text-xs text-gray-500 mt-1">2 days ago</p>
-              </div>
-            </div>
+          <div id="recent-activities" class="space-y-4">
+            <!-- Recent activities will be populated here -->
           </div>
         </div>
       </div>
-    </div>    <!-- Sidebar -->
-
-    <!-- Main Content -->
-    <div class="p-8">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-8">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-800">UI Components</h1>
-          <p class="text-gray-600">Ready-to-use components for your CRM</p>
-        </div>
-      </div>
-
-      <!-- Buttons Section -->
-      <section id="buttons" class="mb-16">
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-          <h2 class="text-xl font-semibold text-gray-800 mb-6">Buttons</h2>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Primary Buttons -->
-            <div class="space-y-4">
-              <h3 class="text-lg font-medium text-gray-700 mb-2">Primary</h3>
-              <div class="space-y-2">
-                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition duration-150 ease-in-out">
-                  Primary Button
-                </button>
-                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition duration-150 flex items-center justify-center">
-                  <i class="fas fa-plus mr-2"></i> Add New
-                </button>
-                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg text-sm font-medium transition duration-150">
-                  Small Button
-                </button>
-              </div>
-            </div>
-            
-            <!-- Secondary Buttons -->
-            <div class="space-y-4">
-              <h3 class="text-lg font-medium text-gray-700 mb-2">Secondary</h3>
-              <div class="space-y-2">
-                <button class="w-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg font-medium transition duration-150">
-                  Secondary Button
-                </button>
-                <button class="w-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg font-medium transition duration-150 flex items-center justify-center">
-                  <i class="fas fa-filter mr-2"></i> Filter
-                </button>
-                <button class="w-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 py-1 px-3 rounded-lg text-sm font-medium transition duration-150">
-                  Small Button
-                </button>
-              </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="space-y-4">
-              <h3 class="text-lg font-medium text-gray-700 mb-2">Action</h3>
-              <div class="space-y-2">
-                <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium transition duration-150">
-                  Save
-                </button>
-                <button class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition duration-150">
-                  Delete
-                </button>
-                <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg font-medium transition duration-150">
-                  Warning
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Icon Buttons -->
-          <div class="mt-8">
-            <h3 class="text-lg font-medium text-gray-700 mb-4">Icon Buttons</h3>
-            <div class="flex flex-wrap gap-4">
-              <button class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition duration-150">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition duration-150">
-                <i class="fas fa-check"></i>
-              </button>
-              <button class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition duration-150">
-                <i class="fas fa-trash"></i>
-              </button>
-              <button class="border border-gray-300 hover:bg-gray-50 text-gray-700 p-2 rounded-lg transition duration-150">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="border border-gray-300 hover:bg-gray-50 text-gray-700 p-2 rounded-lg transition duration-150">
-                <i class="fas fa-download"></i>
-              </button>
-              <button class="border border-gray-300 hover:bg-gray-50 text-gray-700 p-2 rounded-lg transition duration-150">
-                <i class="fas fa-print"></i>
-              </button>
-            </div>
-          </div>
-          
-          <!-- Button Groups -->
-          <div class="mt-8">
-            <h3 class="text-lg font-medium text-gray-700 mb-4">Button Groups</h3>
-            <div class="inline-flex rounded-lg overflow-hidden">
-              <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 font-medium transition duration-150">
-                Day
-              </button>
-              <button class="bg-blue-700 text-white py-2 px-4 font-medium transition duration-150">
-                Week
-              </button>
-              <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 font-medium transition duration-150">
-                Month
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Tables Section -->
-      <section id="tables" class="mb-16">
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-          <h2 class="text-xl font-semibold text-gray-800 mb-6">Tables</h2>
-          
-          <!-- Standard Table -->
-          <div class="mb-12">
-            <h3 class="text-lg font-medium text-gray-700 mb-4">Standard Table</h3>
-            <div class="overflow-x-auto">
-              <table class="min-w-full bg-white">
-                <thead>
-                  <tr class="bg-gray-50 border-b">
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">John Smith</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">john@example.com</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Admin</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                      <button class="text-blue-600 hover:text-blue-900">Edit</button>
-                      <button class="ml-2 text-red-600 hover:text-red-900">Delete</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Jane Cooper</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">jane@example.com</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">User</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                      <button class="text-blue-600 hover:text-blue-900">Edit</button>
-                      <button class="ml-2 text-red-600 hover:text-red-900">Delete</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Robert Fox</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">robert@example.com</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Inactive</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">User</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                      <button class="text-blue-600 hover:text-blue-900">Edit</button>
-                      <button class="ml-2 text-red-600 hover:text-red-900">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          
-          <!-- Striped Table -->
-          <div class="mb-12">
-            <h3 class="text-lg font-medium text-gray-700 mb-4">Striped Table</h3>
-            <div class="overflow-x-auto">
-              <table class="min-w-full bg-white">
-                <thead>
-                  <tr class="bg-gray-50 border-b">
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="bg-white">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">INV-0012</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">John Smith</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Apr 15, 2025</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$1,240</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Paid</span>
-                    </td>
-                  </tr>
-                  <tr class="bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">INV-0011</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Sarah Johnson</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Apr 12, 2025</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$890</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Paid</span>
-                    </td>
-                  </tr>
-                  <tr class="bg-white">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">INV-0010</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Michael Davis</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Apr 10, 2025</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$2,600</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                    </td>
-                  </tr>
-                  <tr class="bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">INV-0009</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Emily Wilson</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Apr 5, 2025</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$450</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Overdue</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          
-          <!-- Card Table With Pagination -->
-          <div>
-            <h3 class="text-lg font-medium text-gray-700 mb-4">Card Table With Pagination</h3>
-            <div class="bg-white rounded-lg border border-gray-200">
-              <div class="flex justify-between items-center p-4 border-b">
-                <h4 class="font-medium text-gray-700">Products</h4>
-                <div class="flex space-x-2">
-                  <button class="bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded text-sm hover:bg-gray-50">
-                    <i class="fas fa-filter mr-1"></i> Filter
-                  </button>
-                  <button class="bg-blue-600 text-white py-1 px-3 rounded text-sm hover:bg-blue-700">
-                    <i class="fas fa-plus mr-1"></i> Add
-                  </button>
-                </div>
-              </div>
-              
-              <div class="overflow-x-auto">
-                <table class="min-w-full">
-                  <thead>
-                    <tr class="bg-gray-50">
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                      <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200">
-                    <tr>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-box text-gray-500"></i>
-                          </div>
-                          <div>
-                            <div class="text-sm font-medium text-gray-800">Premium Headphones</div>
-                            <div class="text-xs text-gray-500">#PRD-0123</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Electronics</td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$129.99</td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">In Stock</span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                        <button class="text-blue-600 hover:text-blue-900">Edit</button>
-                        <button class="ml-2 text-red-600 hover:text-red-900">Delete</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-box text-gray-500"></i>
-                          </div>
-                          <div>
-                            <div class="text-sm font-medium text-gray-800">Wireless Keyboard</div>
-                            <div class="text-xs text-gray-500">#PRD-0124</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Electronics</td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$79.99</td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Low Stock</span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                        <button class="text-blue-600 hover:text-blue-900">Edit</button>
-                        <button class="ml-2 text-red-600 hover:text-red-900">Delete</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-box text-gray-500"></i>
-                          </div>
-                          <div>
-                            <div class="text-sm font-medium text-gray-800">Office Chair</div>
-                            <div class="text-xs text-gray-500">#PRD-0125</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Furniture</td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$199.99</td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">In Stock</span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                        <button class="text-blue-600 hover:text-blue-900">Edit</button>
-                        <button class="ml-2 text-red-600 hover:text-red-900">Delete</button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              
-              <div class="px-6 py-4 border-t flex items-center justify-between">
-                <div class="text-sm text-gray-600">
-                  Showing 1 to 3 of 12 entries
-                </div>
-                <div class="flex space-x-2">
-                  <button class="px-3 py-1 bg-white border border-gray-300 rounded text-gray-600 hover:bg-gray-50 disabled:opacity-50" disabled>
-                    Previous
-                  </button>
-                  <button class="px-3 py-1 bg-blue-600 border border-blue-600 rounded text-white hover:bg-blue-700">
-                    1
-                  </button>
-                  <button class="px-3 py-1 bg-white border border-gray-300 rounded text-gray-600 hover:bg-gray-50">
-                    2
-                  </button>
-                  <button class="px-3 py-1 bg-white border border-gray-300 rounded text-gray-600 hover:bg-gray-50">
-                    3
-                  </button>
-                  <button class="px-3 py-1 bg-white border border-gray-300 rounded text-gray-600 hover:bg-gray-50">
-                    Next
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Forms Section -->
-      <section id="forms" class="mb-16">
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-          <h2 class="text-xl font-semibold text-gray-800 mb-6">Forms</h2>
-          
-          <!-- Input Fields -->
-          <div class="mb-12">
-            <h3 class="text-lg font-medium text-gray-700 mb-4">Input Fields</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Basic Input -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
-                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-150" placeholder="Enter your name">
-              </div>
-              
-              <!-- Email Input -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address
-                </label>
-                <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-150" placeholder="email@example.com">
-              </div>
-              
-              <!-- Input with Icon -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Search
-                </label>
-                <div class="relative">
-                  <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-150" placeholder="Search...">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Input with Help Text -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-150" placeholder="Enter password">
-                <p class="mt-1 text-xs text-gray-500">Password must be at least 8 characters long.</p>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Select & Checkboxes -->
-          <div class="mb-12">
-            <h3 class="text-lg font-medium text-gray-700 mb-4">Select & Checkboxes</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Select -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Country
-                </label>
-                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-150 bg-white">
-                  <option value="">Select a country</option>
-                  <option value="us">United States</option>
-                  <option value="ca">Canada</option>
-                  <option value="uk">United Kingdom</option>
-                  <option value="au">Australia</option>
-                </select>
-              </div>
-               <!-- Multi Select -->
-               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Role
-                </label>
-                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-150 bg-white" multiple>
-                  <option value="admin">Admin</option>
-                  <option value="editor">Editor</option>
-                  <option value="user">User</option>
-                  <option value="guest">Guest</option>
-                </select>
-                <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd to select multiple options.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Tables Section -->
-  </div>
+    </div>  
 
   <script>
     // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    const revenueChart = new Chart(revenueCtx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Revenue',
-          data: [4800, 5200, 4700, 6500, 5900, 7000, 6800],
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          borderColor: 'rgba(59, 130, 246, 1)',
-          borderWidth: 2,
-          tension: 0.4,
-          fill: true
-        }]
-      },
-      options: {
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              drawBorder: false
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
-    });
+    let revenueChart;
 
+    function loadRevenueChart(period = 'weekly') {
+        fetch(`/dashboard/revenue-data?period=${period}`)
+            .then(res => res.json())
+            .then(data => {
+                const labels = data.map(item => item.label);
+                const values = data.map(item => parseFloat(item.value));
+
+                if (revenueChart) {
+                    revenueChart.data.labels = labels;
+                    revenueChart.data.datasets[0].data = values;
+                    revenueChart.update();
+                } else {
+                    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+                    revenueChart = new Chart(revenueCtx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Revenue',
+                                data: values,
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { beginAtZero: true, grid: { drawBorder: false } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            });
+    }
+
+    // Initial load
+    loadRevenueChart('weekly');
+
+    // Event listeners for buttons
+    document.querySelectorAll('.revenue-period-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.revenue-period-btn').forEach(b => b.classList.remove('text-blue-500', 'font-medium'));
+            btn.classList.add('text-blue-500', 'font-medium');
+
+            const period = btn.dataset.period;
+            loadRevenueChart(period);
+        });
+    });
     // Category Chart
-    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-    const categoryChart = new Chart(categoryCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Electronics', 'Furniture', 'Clothing', 'Software', 'Services'],
-        datasets: [{
-          label: 'Sales',
-          data: [12500, 8700, 6200, 9300, 7800],
-          backgroundColor: [
-            'rgba(59, 130, 246, 0.7)',
-            'rgba(139, 92, 246, 0.7)',
-            'rgba(16, 185, 129, 0.7)',
-            'rgba(245, 158, 11, 0.7)',
-            'rgba(239, 68, 68, 0.7)'
-          ],
-          borderWidth: 0,
-          borderRadius: 4
-        }]
-      },
-      options: {
-        plugins: {
-          legend: {
-            display: false
+    let categoryChart;
+
+    function fetchCategoryData(days = 30) {
+      fetch(`/dashboard/category-sales?days=${days}`)
+        .then(response => response.json())
+        .then(data => {
+          const labels = data.map(item => item.label);
+          const values = data.map(item => item.value);
+
+          if (categoryChart) {
+            categoryChart.data.labels = labels;
+            categoryChart.data.datasets[0].data = values;
+            categoryChart.update();
+          } else {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: 'Sales',
+                  data: values,
+                  backgroundColor: [
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(139, 92, 246, 0.7)',
+                    'rgba(16, 185, 129, 0.7)',
+                    'rgba(245, 158, 11, 0.7)',
+                    'rgba(239, 68, 68, 0.7)'
+                  ],
+                  borderRadius: 4
+                }]
+              },
+              options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                  y: { beginAtZero: true, grid: { drawBorder: false } },
+                  x: { grid: { display: false } }
+                }
+              }
+            });
           }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              drawBorder: false
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
+        });
+    }
+
+    document.getElementById('categoryFilter').addEventListener('change', function () {
+      fetchCategoryData(this.value);
     });
 
+    // Initial Load
+    fetchCategoryData();
     // Conversion Chart
     const conversionCtx = document.getElementById('conversionChart').getContext('2d');
     const conversionChart = new Chart(conversionCtx, {
@@ -840,5 +390,125 @@
         cutout: '65%'
       }
     });
+
+        function loadRecentActivities() {
+        fetch('/dashboard/recent-activities')  // Adjust the URL to your route
+            .then(res => res.json())
+            .then(activities => {
+                const activitiesContainer = document.getElementById('recent-activities');
+                activitiesContainer.innerHTML = '';  // Clear the container
+
+                activities.forEach(activity => {
+                    // Create the activity elements
+                    const activityElement = document.createElement('div');
+                    activityElement.classList.add('flex', 'items-start', 'mb-4');
+
+                    const iconContainer = document.createElement('div');
+                    iconContainer.classList.add('w-10', 'h-10', 'rounded-full', 'flex', 'items-center', 'justify-center', 'mr-4');
+                    iconContainer.classList.add(activity.icon_class); // Example: 'bg-blue-100' or 'bg-green-100'
+
+                    const icon = document.createElement('i');
+                    icon.classList.add(activity.icon);  // Example: 'fas fa-plus-circle'
+
+                    iconContainer.appendChild(icon);
+
+                    const textContainer = document.createElement('div');
+
+                    const title = document.createElement('p');
+                    title.classList.add('text-sm', 'font-medium', 'text-gray-800');
+                    title.textContent = activity.activity_type;  // Activity title
+
+                    const description = document.createElement('p');
+                    description.classList.add('text-sm', 'text-gray-600');
+                    description.textContent = activity.description;  // Activity description
+
+                    const time = document.createElement('p');
+                    time.classList.add('text-xs', 'text-gray-500', 'mt-1');
+                    time.textContent = activity.created_at;  // Formatted time (e.g., "2 hours ago")
+
+                    textContainer.appendChild(title);
+                    textContainer.appendChild(description);
+                    textContainer.appendChild(time);
+
+                    activityElement.appendChild(iconContainer);
+                    activityElement.appendChild(textContainer);
+
+                    activitiesContainer.appendChild(activityElement);
+                });
+            });
+    }
+
+    // Load activities when the page loads
+    document.addEventListener('DOMContentLoaded', loadRecentActivities);
   </script>
+  <script>
+    // Function to fetch and display the stats
+    function loadStats() {
+        fetch('/stats') // Adjust the endpoint if necessary
+            .then(response => response.json())
+            .then(data => {
+                const statsContainer = document.getElementById('stats-container');
+                
+                // Define the stat cards
+                const statCards = [
+                    {
+                        title: "Total Customers",
+                        value: data.totalCustomers,
+                        iconClass: "fas fa-users",
+                        percentage: "+12%",
+                        bgClass: "bg-green-100",
+                        textClass: "text-green-800"
+                    },
+                    {
+                        title: "Active Leads",
+                        value: data.activeLeads,
+                        iconClass: "fas fa-user-plus",
+                        percentage: "+5%",
+                        bgClass: "bg-purple-100",
+                        textClass: "text-purple-500"
+                    },
+                    {
+                        title: "Revenue",
+                        value: "₹" + data.revenue.toLocaleString(), // Format revenue with ₹ symbol
+                        iconClass: "fas fa-rupee-sign",  // Replace dollar icon with rupee icon
+                        percentage: "+18%",
+                        bgClass: "bg-green-100",
+                        textClass: "text-green-500"
+                    },
+                    {
+                        title: "Pending Orders",
+                        value: data.pendingOrders,
+                        iconClass: "fas fa-clock",
+                        percentage: "+3%",
+                        bgClass: "bg-yellow-100",
+                        textClass: "text-yellow-500"
+                    }
+                ];
+
+                // Create HTML for each stat card
+                statsContainer.innerHTML = statCards.map(stat => {
+                    return `
+                        <div class="bg-white rounded-lg p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-gray-500 text-sm font-medium">${stat.title}</h3>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${stat.percentage}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <p class="text-2xl font-bold text-gray-800">${stat.value}</p>
+                                <div class="w-12 h-12 ${stat.bgClass} rounded-full flex items-center justify-center ${stat.textClass}">
+                                    <i class="${stat.iconClass}"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            })
+            .catch(error => {
+                console.error('Error fetching stats:', error);
+            });
+    }
+
+    // Call the function to load the stats when the page loads
+    document.addEventListener('DOMContentLoaded', loadStats);
+</script>
 @endsection

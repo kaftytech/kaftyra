@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center p-4 border-b">
             <h4 class="font-medium text-gray-700">Units</h4>            
           </div>
-          <form action="{{ isset($unit) ? route('units.update', $unit->id) : route('units.store') }}" method="POST" class="mt-4">
+          {{-- <form action="{{ isset($unit) ? route('units.update', $unit->id) : route('units.store') }}" method="POST" class="mt-4">
             @csrf
             @if(isset($unit))
                 @method('PUT')
@@ -80,9 +80,9 @@
           
             <div class="mt-4">
               {{ $units->links() }}
-            </div>
-        </div>
-        
+            </div> --}}
+        {{-- </div> --}}
+        @livewire('inventory.unit-form')
     </div>
  </div>
 @endsection

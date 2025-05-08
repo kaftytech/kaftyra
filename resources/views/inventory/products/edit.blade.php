@@ -13,8 +13,10 @@
               </button>
             </div>
         </div>
+        @livewire('inventory.product-form', ['product' => $product])
+
         <!-- Form -->
-        <form action="{{ route('products.update', $product->id) }}" method="POST" class="mt-4">
+        {{-- <form action="{{ route('products.update', $product->id) }}" method="POST" class="mt-4">
             @csrf
             <div class="p-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -61,7 +63,7 @@
                     </button>
                 </div>
             </div>    
-        </form>    
+        </form>     --}}
     </div>
 </div>
 @endsection

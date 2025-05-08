@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasAuditLog;
 
 class OrderRequest extends Model
 {
+    use HasAuditLog;
     protected $fillable = [
         'customer_id', 'order_id' ,'request_date', 'status', 'approved_by', 'approved_date', 'notes'
     ];

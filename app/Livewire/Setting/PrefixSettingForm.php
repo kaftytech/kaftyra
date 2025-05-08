@@ -14,6 +14,7 @@ class PrefixSettingForm extends Component
         'Purchase' => 'Purchase',
         'CreditNote' => 'Credit Note',
         'OrderRequest' => 'Order Request',
+        'Employee' => 'Employee',
     ];    
 
     public function mount()
@@ -55,6 +56,7 @@ class PrefixSettingForm extends Component
             'Purchase' => 'PUR',
             'CreditNote' => 'CRN',
             'OrderRequest' => 'ORD',
+            'Employee' => 'EMP',
             default => '',
         };
     }

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasAuditLog;
 
 class Unit extends Model
 {
+    use HasAuditLog;
     protected $table = 'units'; // Specify the table name if it's different from the default
     protected $fillable = [
         'name',

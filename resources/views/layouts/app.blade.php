@@ -18,7 +18,7 @@
         <!-- Styles -->
         <!-- Select2 CSS -->
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
+        <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
         @livewireStyles
     </head>
     <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">

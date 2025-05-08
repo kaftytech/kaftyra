@@ -13,7 +13,7 @@
           <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $stock->id }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $stock->product->name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $stock->quantity }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $stock->current_stock }}</td>
           </tr>
           @empty
           <tr>

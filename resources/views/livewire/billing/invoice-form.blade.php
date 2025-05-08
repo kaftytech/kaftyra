@@ -63,12 +63,44 @@
                         <!-- Invoice general information -->
                         <div>
                             <label for="orderRequestId" class="block text-sm font-medium text-gray-700 mb-1">Order Request Id</label>
-                            <select wire:change="updateOrderRequestId($event.target.value)" id="orderRequestId" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" id="customer" wire:model.live="order_request_id">
+                            {{-- <select wire:change="updateOrderRequestId($event.target.value)" id="orderRequestId" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" id="customer" wire:model.live="order_request_id">
                                 <option value="">Order Request ID</option>
                                 @foreach($orders as $order)
                                     <option value="{{ $order->id }}">{{ $order->order_id }}</option>
                                 @endforeach
-                            </select>
+                            </select> --}}
+                            <div class="relative">
+                                <input id="order_search_by_query" 
+                                       name="order_search_by_query" 
+                                       type="text"
+                                       wire:model.live.debounce.500ms="order_search_by_query"
+                                       wire:keydown.arrow-down="highlightNextOrder" 
+                                       wire:keydown.arrow-up="highlightPreviousOrder" 
+                                       wire:keydown.enter="selectHighlightedOrder" 
+                                       placeholder="Search Order Request" 
+                                       class="w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            
+                                <input wire:model.live="order_search_by" type="text" name="order_search_by" id="order_search_by" hidden>
+                            
+                                @if (!empty($order_search_by_query) && $order_search_by_query_status !== 'selected')
+                                    <ul class="list-group absolute z-10 bg-white border w-full mt-1 rounded shadow">
+                                        @if (!empty($orders))
+                                            @foreach ($orders as $index => $data)
+                                                <li>
+                                                    <a class="py-2 px-3 list-group-item hover:bg-slate-100 cursor-pointer @if($highlightIndexOrder === $index) bg-blue-100 @endif" 
+                                                       wire:click.prevent="selectOrderRequest({{ $data['id'] }})" 
+                                                       data-index="{{ $index }}">
+                                                        {{ $data['order_id'] }}  <!-- Adjust this based on what info you want to show -->
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        @else
+                                            <div class="py-2 px-3 hover:bg-slate-100 w-full cursor-pointer">No data!</div>
+                                        @endif
+                                    </ul>
+                                @endif
+                            </div>
+                            
                             @error('order_request_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         {{-- <div>
@@ -83,13 +115,40 @@
                         </div>
                         <div>
                             <label for="customer" class="block text-sm font-medium text-gray-700 mb-1">Customer</label>
-                            <select class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" id="customer" wire:model.live="customer_id">
-                                <option value="">Select Customer</option>
-                                @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">{{ $customer->customer_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('customer_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <div class="relative">
+                                    <input id="search_by_query" 
+                                        name="search_by_query" 
+                                        type="text"
+                                        wire:model.live.debounce.500ms="search_by_query"
+                                        wire:keydown.arrow-down="highlightNext" 
+                                        wire:keydown.arrow-up="highlightPrevious" 
+                                        wire:keydown.enter="selectHighlighted" 
+                                        placeholder="Search Customer" 
+                                        class="w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                        
+                                    <input wire:model.live="search_by" type="text" name="search_by" id="search_by" hidden>
+                                    
+                                    @if (!empty($search_by_query) && $search_by_query_status !== 'selected')
+                                        <ul class="list-group absolute z-10 bg-white border w-full mt-1 rounded shadow">
+                                            @if (!empty($customers))
+                                                @foreach ($customers as $index => $data)
+                                                    <li>
+                                                        <a class="py-2 px-3 list-group-item hover:bg-slate-100 cursor-pointer @if($highlightIndex === $index) bg-blue-100 @endif" 
+                                                        wire:click.prevent="sbSelect({{ $data['id'] }})" 
+                                                        data-index="{{ $index }}">
+                                                            {{ $data['customer_name'] }} | {{ $data['phone'] }}
+                                                        </a>
+                                                    </li>
+                                                @endforeach
+                                            @else
+                                                <div class="py-2 px-3 hover:bg-slate-100 w-full cursor-pointer">No data!</div>
+                                            @endif
+                                        </ul>
+                                    @endif
+                                </div>
+                                @error('search_by_query') 
+                                    <span class="text-red-500 text-sm">{{ $message }}</span> 
+                                @enderror
                         </div>
                     </div>
 
@@ -113,7 +172,7 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($invoiceItems as $index => $item)
                                 <tr>
-                                    <td class="px-4 py-4 whitespace-nowrap w-64">
+                                    {{-- <td class="px-4 py-4 whitespace-nowrap w-64">
                                         <select class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm"
                                             wire:model.live="invoiceItems.{{ $index }}.product_id"
                                             wire:change="productSelected({{ $index }}, $event.target.value)">
@@ -125,7 +184,40 @@
                                             @endforeach
                                         </select>
                                         @error("invoiceItems.$index.product_id") <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                    </td>
+                                    </td> --}}
+                                    <td class="px-4 py-4 whitespace-nowrap w-64">
+                                        <div class="relative">
+                                            <input type="text"
+                                                placeholder="Search Product"
+                                                class="w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                wire:model.live.debounce.500ms="invoiceItems.{{ $index }}.product_search"
+                                                wire:keydown.arrow-down="highlightProductNextWrapper({{ $index }})"
+                                                wire:keydown.arrow-up="highlightProductPreviousWrapper({{ $index }})"
+                                                wire:keydown.enter="selectHighlightedProductWrapper({{ $index }})"
+                                            >
+                                    
+                                            <input type="hidden" wire:model.live="invoiceItems.{{ $index }}.product_id">
+                                    
+                                            @if (!empty($invoiceItems[$index]['product_search']) && $invoiceItems[$index]['search_status'] !== 'selected')
+                                                <ul class="absolute z-10 bg-white border w-full mt-1 rounded shadow">
+                                                    @if (!empty($invoiceItems[$index]['search_results']))
+                                                        @foreach ($invoiceItems[$index]['search_results'] as $pIndex => $product)
+                                                            <li wire:click.prevent="selectProductWrapper({{ $index }}, {{ $product['id'] }})"
+                                                                class="px-3 py-2 hover:bg-slate-100 cursor-pointer @if($invoiceItems[$index]['highlight_index'] === $pIndex) bg-blue-100 @endif">
+                                                                {{ $product['name'] }} ({{ $product['product_code'] }})
+                                                            </li>
+                                                        @endforeach
+                                                    @else
+                                                        <li class="px-3 py-2 text-gray-500">No products found</li>
+                                                    @endif
+                                                </ul>
+                                            @endif
+                                    
+                                            @error("invoiceItems.$index.product_id")
+                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </td>                                                                    
                                     
                                     {{-- <td class="px-6 py-4 whitespace-nowrap">
                                         <input type="text" class="w-full rounded-md border-gray-300 bg-gray-100 shadow-sm text-sm" 
@@ -364,28 +456,27 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <h4 class="text-lg font-medium text-gray-800 mb-2">{{ $company->name }}</h4>
-                        <div class="space-y-1 text-sm text-gray-600">
-                            <p>{{ $company->address_line_1 . ' ,' . $company->address_line_2 }}</p>
-                            <p>{{ $company->city . ', ' . $company->state . ' ' . $company->postal_code }}</p> 
-                            <p>Phone: {{ $company->phone ?? '' }}</p>
-                            <p>Email: {{ $company->email ?? '' }}</p>
-                        </div>
+                        @if($company)
+                            <h4 class="text-lg font-medium text-gray-800 mb-2">{{ $company->name ?? '' }}</h4>
+                            <div class="space-y-1 text-sm text-gray-600">
+                                <p>{{ $company->address_line_1  . ' ,' . $company->address_line_2 }}</p>
+                                <p>{{ $company->city . ', ' . $company->state . ' ' . $company->postal_code }}</p> 
+                                <p>Phone: {{ $company->phone ?? '' }}</p>
+                                <p>Email: {{ $company->email ?? '' }}</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <h5 class="text-lg font-medium text-gray-800 mb-2">Bill To:</h5>
-                        @if($customer_id)
-                            @php $customer = $customers->find($customer_id); @endphp
-                            <div class="space-y-1 text-sm text-gray-600">
-                                <p class="font-medium text-gray-800">{{ $customer->name }}</p>
-                                <p>{{ $customer->address ?? '' }}</p>
-                                <p>{{ $customer->email ?? '' }}</p>
-                                <p>{{ $customer->phone ?? '' }}</p>
-                            </div>
-                        @endif
+                        <div class="space-y-1 text-sm text-gray-600">
+                            <p class="font-medium text-gray-800">{{ $customer->customer_name }}</p>
+                            <p>{{ $customer->address ?? '' }}</p>
+                            <p>{{ $customer->email ?? '' }}</p>
+                            <p>{{ $customer->phone ?? '' }}</p>
+                        </div>
                     </div>
                     <div class="text-right">
                         <h5 class="text-lg font-medium text-gray-800 mb-2">Payment Information:</h5>

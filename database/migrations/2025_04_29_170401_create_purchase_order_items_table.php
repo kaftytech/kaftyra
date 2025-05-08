@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
             $table->integer('quantity');
             $table->decimal('price', 15, 2);
+            $table->decimal('total', 10, 2); // quantity × price
             $table->enum('discount_type', ['percentage', 'fixed','free']);
             $table->decimal('discount', 8, 2)->nullable();
             $table->decimal('discount_amount', 8, 2)->nullable();

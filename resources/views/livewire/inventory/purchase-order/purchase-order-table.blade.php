@@ -19,13 +19,13 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->id }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->po_number }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->po_date }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->status }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->total_amount }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->vendor?->name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->status }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->vendor?->company_name }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->created_at }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
               <button class="text-blue-600 hover:text-blue-900">
-                <a href="{{route('stock.edit',$order->id)}}">
+                <a href="{{route('purchase-orders.edit',$order->id)}}">
                   <i class="fas fa-edit"></i>
                 </a>
               </button>

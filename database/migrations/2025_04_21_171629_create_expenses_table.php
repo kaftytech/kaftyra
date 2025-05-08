@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('reference_number')->nullable(); // Reference number for the payment
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->timestamps();
             $table->softDeletes(); // For soft delete functionality
         });

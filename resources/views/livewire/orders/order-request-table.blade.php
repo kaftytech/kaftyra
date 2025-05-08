@@ -16,7 +16,7 @@
           @forelse($orders as $order)
           <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->id }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->order_id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><a href="{{route('order-requests.show',$order->id)}}" class="text-blue-600 hover:text-blue-900">{{ $order->order_id }}</a></td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->customer->customer_name }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->request_date }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -29,6 +29,11 @@
               <button class="text-blue-600 hover:text-blue-900">
                 <a href="{{route('order-requests.edit',$order->id)}}">
                   <i class="fas fa-edit"></i>
+                </a>
+              </button>
+              <button class="text-blue-600 hover:text-blue-900">
+                <a href="{{route('convert.invoice',$order->id)}}">
+                  <i class="fa fa-exchange"></i>
                 </a>
               </button>
               <button class="ml-2 text-red-600 hover:text-red-900">

@@ -7,7 +7,7 @@
             <h4 class="font-medium text-gray-700">Purchase Order Edit</h4>
           </div>
         <!-- Table -->
-        @livewire('orders.order-request-form', ['orderRequestId' => $order->id])
+        @livewire('inventory.purchase-order.purchase-order-form', ['purchaseOrderId' => $purchaseOrder->id])
     </div>
  </div>
 @endsection

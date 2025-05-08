@@ -51,42 +51,97 @@
                        Dashboard
                    </span>
                </a>
+                <!-- People Section -->
+                <div x-data="{ open: false }" class="mb-2">
+                    <button @click="open = !open; activeDropdown = open ? 'inventory' : null" 
+                            class="w-full flex items-center justify-between py-3 px-3 rounded-lg transition-all hover:bg-gray-700 focus:outline-none group {{ request()->routeIs('inventory.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-300 group-hover:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                              </svg>
+                            <span class="ml-3 transition-opacity duration-200"
+                                :class="isOpen ? 'opacity-100' : 'opacity-0 md:hidden'">
+                                People
+                            </span>
+                        </div>
+                        <svg class="w-4 h-4 transition-transform duration-200 transform"
+                            :class="{'rotate-180': open, 'opacity-0': !isOpen && window.innerWidth >= 768}"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="open || (!isOpen && window.innerWidth >= 768 && activeDropdown === 'people')" 
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="transform opacity-0 scale-95"
+                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="transform opacity-100 scale-100"
+                        x-transition:leave-end="transform opacity-0 scale-95"
+                        class="pl-10 mt-1 space-y-1">
+                        <a href="{{ route('admin.users.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('users.index') ? 'bg-gray-700 text-white' : '' }}"
+                        :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Users</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Users">U</span>
+                        </a>
+                        <a href="{{ route('employee.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('employee.index') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Employees</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Employees">E</span>
+                        </a>
+                        <a href="{{ route('leads.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('customers.index') ? 'bg-gray-700 text-white' : '' }}"
+                        :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Leads</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Leads">L</span>
+                        </a>
+                        <a href="{{ route('vendors.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('leads.index') ? 'bg-gray-700 text-white' : '' }}"
+                        :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Vendors</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Vendors">Vendors</span>
+                        </a>
+                    </div>
+                </div>
 
-               <!-- Users Link -->
-               <a href="{{ route('admin.users.index') }}" class="flex items-center py-3 px-3 mb-2 rounded-lg transition-all hover:bg-gray-700 group {{ request()->routeIs('admin.users.index') ? 'bg-blue-600 hover:bg-blue-700' : '' }}">
-                    <svg class="w-6 h-6 text-gray-300 group-hover:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                      </svg>
-                      
-                    <span class="ml-3 transition-opacity duration-200"
-                        :class="isOpen ? 'opacity-100' : 'opacity-0 md:hidden'">
-                        Users
-                    </span>
-                </a>
-
-                 <!-- Leads Link -->
-               <a href="{{ route('leads.index') }}" class="flex items-center py-3 px-3 mb-2 rounded-lg transition-all hover:bg-gray-700 group {{ request()->routeIs('leads.index') ? 'bg-blue-600 hover:bg-blue-700' : '' }}">
-                    <svg class="w-6 h-6 text-gray-300 group-hover:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                    </svg>
-                    
-                    <span class="ml-3 transition-opacity duration-200"
-                        :class="isOpen ? 'opacity-100' : 'opacity-0 md:hidden'">
-                        Leads
-                    </span>
-                </a>
-
-                <!-- Customers Link -->
-               <a href="{{ route('customers.index') }}" class="flex items-center py-3 px-3 mb-2 rounded-lg transition-all hover:bg-gray-700 group {{ request()->routeIs('customers.index') ? 'bg-blue-600 hover:bg-blue-700' : '' }}">
-                    <svg class="w-6 h-6 text-gray-300 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    
-                    <span class="ml-3 transition-opacity duration-200"
-                        :class="isOpen ? 'opacity-100' : 'opacity-0 md:hidden'">
-                        Customers
-                    </span>
-                </a>
+                <!-- Business Unit Section -->
+                <div x-data="{ open: false }" class="mb-2">
+                    <button @click="open = !open; activeDropdown = open ? 'inventory' : null" 
+                            class="w-full flex items-center justify-between py-3 px-3 rounded-lg transition-all hover:bg-gray-700 focus:outline-none group {{ request()->routeIs('inventory.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-300 group-hover:text-blue-400 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                            </svg>
+                                  
+                            <span class="ml-3 transition-opacity duration-200"
+                                :class="isOpen ? 'opacity-100' : 'opacity-0 md:hidden'">
+                                Business Units
+                            </span>
+                        </div>
+                        <svg class="w-4 h-4 transition-transform duration-200 transform"
+                            :class="{'rotate-180': open, 'opacity-0': !isOpen && window.innerWidth >= 768}"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="open || (!isOpen && window.innerWidth >= 768 && activeDropdown === 'people')" 
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="transform opacity-0 scale-95"
+                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="transform opacity-100 scale-100"
+                        x-transition:leave-end="transform opacity-0 scale-95"
+                        class="pl-10 mt-1 space-y-1">
+                        <a href="{{ route('branch.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('users.index') ? 'bg-gray-700 text-white' : '' }}"
+                        :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Branch</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Branch">U</span>
+                        </a>
+                        <a href="{{ route('vehicles.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('employee.index') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Vehicles</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Vehicles">E</span>
+                        </a>
+                    </div>
+                </div>
+                
                
                <!-- Inventory Section -->
                <div x-data="{ open: false }" class="mb-2">
@@ -115,11 +170,6 @@
                         x-transition:leave-start="transform opacity-100 scale-100"
                         x-transition:leave-end="transform opacity-0 scale-95"
                         class="pl-10 mt-1 space-y-1">
-                       <a href="{{ route('vendors.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('inventory.vendors') ? 'bg-gray-700 text-white' : '' }}"
-                          :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
-                           <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Vendors</span>
-                           <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Vendors">V</span>
-                       </a>
                        <a href="{{ route('purchase-orders.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('inventory.stocks') ? 'bg-gray-700 text-white' : '' }}"
                             :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Purchase Order</span>
@@ -145,6 +195,11 @@
                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Stocks</span>
                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Stocks">S</span>
                        </a>
+                       <a href="{{ route('product-returns.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Product Returns</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Product Returns">PR</span>
+                        </a>
                    </div>
                </div>
                 <!-- Billing Section -->
@@ -180,10 +235,10 @@
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Order Requests</span>
                             <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Order Request">I</span>
                         </a>
-                        <a href="{{ route('product-returns.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                        <a href="{{ route('shipping.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
                             :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
-                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Product Returns</span>
-                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Product Returns">PR</span>
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Shipping</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Shipping">PR</span>
                         </a>
                     </div>
                 </div>
@@ -198,7 +253,7 @@
                            </svg>
                            <span class="ml-3 transition-opacity duration-200"
                                  :class="isOpen ? 'opacity-100' : 'opacity-0 md:hidden'">
-                               Billing
+                               Finance
                            </span>
                        </div>
                        <svg class="w-4 h-4 transition-transform duration-200 transform"
@@ -225,9 +280,58 @@
                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Payments</span>
                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Payments">P</span>
                        </a>
+                       <a href="{{ route('expenses.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('expenses.index') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Expense</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Expense">E</span>
+                        </a>
+                        <a href="{{ route('expenses.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.payments') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Transaction</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Transaction">E</span>
+                        </a>
                    </div>
                </div>
-               
+               <!-- Reports Section -->
+               <div x-data="{ open: false }" class="mb-2">
+                    <button @click="open = !open; activeDropdown = open ? 'orders' : null" 
+                            class="w-full flex items-center justify-between py-3 px-3 rounded-lg transition-all hover:bg-gray-700 focus:outline-none group {{ request()->routeIs('assets.*') ? 'bg-gray-700' : '' }}">
+                        <div class="flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-300 group-hover:text-blue-400">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                              </svg>                            
+                            
+                            <span class="ml-3 transition-opacity duration-200"
+                                    :class="isOpen ? 'opacity-100' : 'opacity-0 md:hidden'">
+                                Reports
+                            </span>
+                        </div>
+                        <svg class="w-4 h-4 transition-transform duration-200 transform"
+                                :class="{'rotate-180': open, 'opacity-0': !isOpen && window.innerWidth >= 768}"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="open || (!isOpen && window.innerWidth >= 768 && activeDropdown === 'billing')" 
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="pl-10 mt-1 space-y-1">
+                        <a href="{{ route('vehicles.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Vehicles</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Vehicle">V</span>
+                        </a>
+                        <a href="{{ route('expenses.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Expense</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Expense">E</span>
+                        </a>
+                    </div>
+                </div>
                <!-- Settings Section -->
                <div x-data="{ open: false }" class="mb-2">
                    <button @click="open = !open; activeDropdown = open ? 'settings' : null" 
@@ -256,6 +360,11 @@
                         x-transition:leave-start="transform opacity-100 scale-100"
                         x-transition:leave-end="transform opacity-0 scale-95"
                         class="pl-10 mt-1 space-y-1">
+                        <a href="{{ route('app.setting') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('settings.profile') ? 'bg-gray-700 text-white' : '' }}"
+                        :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">App Setting</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="app_setting">AS</span>
+                        </a>
                         <a href="{{ route('company.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('settings.profile') ? 'bg-gray-700 text-white' : '' }}"
                         :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Company Setting</span>

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\Category;
+use App\Models\Vendors;
 use App\Imports\ProductImport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -22,7 +23,8 @@ class ProductController extends Controller
     {
         $units = Unit::all();
         $categories = Category::all();
-        return view('inventory.products.create', compact('units', 'categories'));
+        $vendors = Vendors::all();
+        return view('inventory.products.create', compact('units', 'categories', 'vendors'));
     }
     public function store(Request $request)
     {

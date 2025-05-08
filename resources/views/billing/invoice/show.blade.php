@@ -14,6 +14,24 @@
               </button>
             </div>
         </div>
+        <div class="mt-8 flex space-x-4">
+            <a href="{{ route('invoices.pdf.view', $invoice->id) }}" target="_blank" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                View PDF
+            </a>
+            
+            <a href="{{ route('invoices.pdf.download', $invoice->id) }}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download PDF
+            </a>
+        </div>
         <div class="invoice-preview p-8 bg-white rounded-lg shadow-md">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
@@ -126,26 +144,96 @@
                         </tr>
                     </tbody>
                 </table>
+                @if($invoice->signature)
+                    <p>Customer Signature</p>
+                    <img 
+                        src="{{ asset('storage/' . $invoice->signature->signature_path) }}" 
+                        class="mt-4 w-64 h-32 object-contain border border-gray-300 rounded" 
+                        alt="Signature">
+                @endif
+            
             </div>
-            <form action="{{ route('shipping.store') }}" method="POST" class="mt-6">
-                @csrf
-                <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
-                
-                <div class="flex items-center space-x-2">
-                    <label for="initiate_shipping" class="text-sm font-medium text-gray-700">Initiate Shipping?</label>
-                    <select name="initiate_shipping" id="initiate_shipping" class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                    
-                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
-                        Submit
+            @if(!$invoice->signature)
+                <h3 class="text-xl font-semibold mb-4">Customer Signature</h3>
+                <canvas id="signature-pad" class="border border-gray-400 w-full rounded" style="height: 200px;"></canvas>
+        
+                <div class="mt-4 flex gap-4">
+                    <button onclick="clearSignature()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        Clear
                     </button>
+                    <button onclick="previewSignature()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Preview Signature
+                    </button>
+                    <button onclick="storeSignature()" id="save-btn" style="display:none;">Confirm & Save</button>
                 </div>
-            </form>
+        
+                <!-- Output (optional) -->
+                <div id="output" class="mt-4"></div>
+            @endif
         </div>
              
     </div>
  </div>
+ <script>
+    let signaturePad;
+    let lastSignatureData = null;
 
+    window.addEventListener('load', () => {
+        const canvas = document.getElementById('signature-pad');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 200;
+        signaturePad = new SignaturePad(canvas);
+    });
+
+    function clearSignature() {
+        signaturePad.clear();
+        document.getElementById('output').innerHTML = '';
+        document.getElementById('save-btn').style.display = 'none';
+        lastSignatureData = null;
+    }
+
+    function previewSignature() {
+        if (signaturePad.isEmpty()) {
+            alert("Please provide a signature first.");
+            return;
+        }
+
+        // Get the signature image
+        const dataURL = signaturePad.toDataURL();
+        lastSignatureData = dataURL;
+
+        // Preview the image
+        document.getElementById('output').innerHTML = `
+            <p class="text-sm text-gray-600">Signature preview:</p>
+            <img src="${dataURL}" class="mt-2 border rounded max-w-full" />
+        `;
+
+        // Show "Confirm & Save" button
+        document.getElementById('save-btn').style.display = 'inline-block';
+    }
+
+    function storeSignature() {
+        if (!lastSignatureData) {
+            alert("No signature to save. Please preview first.");
+            return;
+        }
+
+        fetch('/billing/invoices/{{ $invoice->id }}/save-signature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ signature: lastSignatureData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.href = data.redirect;
+        })
+
+        .catch(error => {
+            console.error('Error saving signature:', error);
+        });
+    }
+</script>
 @endsection

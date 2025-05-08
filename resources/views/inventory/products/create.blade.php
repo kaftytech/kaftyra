@@ -13,8 +13,9 @@
               </button>
             </div>
         </div>
+        @livewire('inventory.product-form')
         <!-- Form -->
-        <form action="{{ route('products.store') }}" method="POST" class="mt-4">
+        {{-- <form action="{{ route('products.store') }}" method="POST" class="mt-4">
             @csrf
             <div class="p-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -51,7 +52,10 @@
                     <x-input label="Selling Price" name="selling_price" type="number" />
                     <x-input label="GST %" name="gst_percentage" type="number" />
                     <x-textarea label="Description" name="description" />
+
+                    
                 </div>
+                @livewire('inventory.product-form')
                 <div class="mt-6 flex justify-end">
                     <button class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-150">
                         <i class="fa fa-save"></i> Save
@@ -61,7 +65,6 @@
                     </button>
                 </div>
             </div>    
-        </form>    
-    </div>
+        </form>     --}}
 </div>
 @endsection

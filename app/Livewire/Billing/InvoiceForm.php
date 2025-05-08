@@ -18,9 +18,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Log;
-
+use App\Traits\HandlesProductSelection;
+use App\Traits\HandlesCustomerSelection;
+use App\Traits\HandlesOrderRequestSelection;
 class InvoiceForm extends Component
 {
+    use HandlesProductSelection, HandlesCustomerSelection, HandlesOrderRequestSelection;
     public $currentStep = 1;
     public $invoice;
     public $invoiceId;
@@ -29,6 +32,7 @@ class InvoiceForm extends Component
     public $availableProducts = [];
     public $customers = [];
     public $orders = [];
+    public $orderId;
     public $productSearch = '';
     
     // Invoice fields
@@ -55,6 +59,9 @@ class InvoiceForm extends Component
     public $due_amount = 0;
     public $company;
     
+    public $product_id;
+    public $customer;
+
     protected $rules = [
         'invoice_number' => 'required|unique:invoices,invoice_number',
         'customer_id' => 'required|exists:customers,id',
@@ -86,11 +93,10 @@ class InvoiceForm extends Component
             $this->availableProducts = [];
         }
     }
-    public function mount($invoiceId = null)
+    public function mount($invoiceId = null, $orderId = null)
     {
         $this->invoice_date = Carbon::now()->format('Y-m-d');
         // $this->invoice_number = 'INV-' . time();
-        $this->customers = Customers::orderBy('id')->get();
         $this->orders = OrderRequest::orderBy('id')->get();
         $this->availableProducts = Product::with('unit')->get();
         $this->company = Company::first();
@@ -101,6 +107,10 @@ class InvoiceForm extends Component
             $invoice = Invoice::with('taxables')->find($invoiceId);
             $this->total_amount = $this->invoice->total_amount;
             $this->due_amount = $this->invoice->due_amount;
+            $this->customer_id = $this->invoice->customer_id;
+            $this->search_by_query = $this->invoice->customer->customer_name . ' | ' . $this->invoice->customer->phone;
+            $this->customer = $this->invoice->customer;
+            $this->search_by_query_status = 'selected';
 
             $this->taxes = TaxSetting::where('is_active', true)->get();
             foreach ($this->taxes as $tax) {
@@ -116,6 +126,10 @@ class InvoiceForm extends Component
                 $this->taxValues[$tax->name] = $tax->rate; // default from DB
             }
             $this->addItem();
+        }
+        if($orderId)
+        {
+            $this->updateOrderRequestId($orderId);
         }
     }
     
@@ -149,6 +163,8 @@ class InvoiceForm extends Component
                 'product_code' => $item->product->product_code ?? '',
                 'product_id' => $item->product_id,
                 'product_name' => $item->product->name ?? '',
+                'product_search' => $item->product->name . ' (' . $item->product->product_code . ')',
+                'search_status' => 'selected',
                 'quantity' => (int) $item->quantity, // Cast to integer
                 'price' => (float) $item->price, // Cast to float
                 'total' => (float) $item->total, // Cast to float
@@ -180,6 +196,10 @@ class InvoiceForm extends Component
             'tax' => 0,
             'net_total' => 0,
             'available_stock' => 0,
+            'product_search' => '',
+            'search_results' => [],
+            'search_status' => '',
+            'highlight_index' => 0,
             // 'hsn_code' => '',
             'tax_percentage' => 0,
         ];
@@ -198,15 +218,24 @@ class InvoiceForm extends Component
         // dd($orderId);
         $order = OrderRequest::find($orderId);
         $this->customer_id = $order->customer_id;
+        $this->order_search_by_query = $order->order_id;
+        $this->order_search_by_query_status = 'selected';
+        $this->search_by_query = $order->customer->customer_name . ' | ' . $order->customer->phone;
+        $this->customer = $order->customer;
+        $this->search_by_query_status = 'selected';
         $orderItem = OrderItem::where('order_request_id', $orderId)->get();
         foreach($orderItem as $index => $item) {
             $this->invoiceItems[$index]['product_id'] = $item->product->id;
             $this->invoiceItems[$index]['product_name'] = $item->product->name;
+            $this->invoiceItems[$index]['product_code'] = $item->product->product_code;
             $this->invoiceItems[$index]['quantity'] = $item->quantity;
             $this->invoiceItems[$index]['price'] = $item->product->selling_price;
             $this->invoiceItems[$index]['available_stock'] = $item->product->currentStock();
             $this->invoiceItems[$index]['total'] = $item->quantity * $item->product->selling_price;
             $this->invoiceItems[$index]['tax_percentage'] = $item->product->gst_percentage;
+            $this->invoiceItems[$index]['product_search'] = $item->product->name . ' (' . $item->product->product_code . ')';
+            $this->invoiceItems[$index]['search_status'] = 'selected';
+
             $this->calculateItemTotal($index);
 
         }
@@ -214,36 +243,58 @@ class InvoiceForm extends Component
         $this->invoiceItems[$index]['order_request_id'] = $orderId;
     }
     
-    public function productSelected($index, $productId)
-    {
-        $product = Product::find($productId);
-        if ($product) {
-            // Get available stock
-            $availableStock = Stock::where('product_id', $product->id)->first();
-            // dd($availableStock->current_stock);
-            
-            $this->invoiceItems[$index]['product_id'] = $product->id;
-            $this->invoiceItems[$index]['product_name'] = $product->name;
-            $this->invoiceItems[$index]['price'] = $product->selling_price;
-            $this->invoiceItems[$index]['available_stock'] = $availableStock->current_stock;
-            // $this->invoiceItems[$index]['hsn_code'] = $product->hsn_code;
-            $this->invoiceItems[$index]['tax_percentage'] = $product->gst_percentage;
-            
-            $this->calculateItemTotal($index);
-        }
-    }
-    
     public function updatedInvoiceItems($value, $index)
     {
         $parts = explode('.', $index);
-        
-        // Now expecting format: '0.quantity' => ['0', 'quantity']
-        if (count($parts) == 2 && in_array($parts[1], ['quantity','price' ,'discount'])) {
+    
+        // Handle quantity, price, discount update
+        if (count($parts) == 2 && in_array($parts[1], ['quantity', 'price', 'discount'])) {
             $this->calculateItemTotal($parts[0]);
+        }
+    
+        // Handle product search
+        if (count($parts) == 2 && $parts[1] === 'product_search') {
+            $this->handleProductSearchWrapper($parts[0], $value);
+        }
+    }
+        
+    public function handleProductSearchWrapper($index, $query)
+    {
+        $this->handleProductSearch($this->invoiceItems, $index, $query);
+    }
+
+    public function selectProductWrapper($index, $productId)
+    {
+        $error = $this->selectProduct(
+            $this->invoiceItems,
+            $index,
+            $productId,
+            fn($i) => $this->calculateItemTotal($i)
+        );
+
+        if ($error) {
+            $this->addError("invoiceItems.$index.product_id", $error);
         }
     }
 
-    
+
+    public function highlightProductNextWrapper($index)
+    {
+        $this->highlightProductNext($this->invoiceItems, $index);
+    }
+
+    public function highlightProductPreviousWrapper($index)
+    {
+        $this->highlightProductPrevious($this->invoiceItems, $index);
+    }
+
+    public function selectHighlightedProductWrapper($index)
+    {
+        $this->selectHighlightedProduct($this->invoiceItems, $index, fn($i, $id) => $this->selectProductWrapper($i, $id));
+    }
+
+    // Method to handle customer search and update results
+   
     public function updatedDiscount()
     {
         $this->calculateInvoice();
@@ -573,6 +624,10 @@ class InvoiceForm extends Component
             foreach ($this->taxablesData as $data) {
                 $invoice->taxables()->create($data);
             }
+            if($this->orderId)
+            {
+                OrderRequest::where('id', $this->orderId)->update(['converted_invoice_id' => $invoice->id, 'status' => 'approved']);
+            }
             // Process stock adjustments only for locked invoices
             if ($this->invoiceType == 'locked') {
                 // dd($this->invoiceItems);
@@ -729,4 +784,5 @@ class InvoiceForm extends Component
         $this->addItem();
         $this->currentStep = 1;
     }
+
 }

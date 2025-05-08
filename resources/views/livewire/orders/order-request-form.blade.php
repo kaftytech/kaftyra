@@ -9,12 +9,38 @@
             </div>
             <div>
                 <label for="customer" class="block text-sm font-medium text-gray-700 mb-1">Customer</label>
-                <select id="customer" wire:model.live="customer_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    <option value="">Select Customer</option>
-                    @foreach($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->customer_name }}</option>
-                    @endforeach
-                </select>
+                <div class="relative">
+                    <input id="search_by_query" 
+                        name="search_by_query" 
+                        type="text"
+                        wire:model.live.debounce.500ms="search_by_query"
+                        wire:keydown.arrow-down="highlightNext" 
+                        wire:keydown.arrow-up="highlightPrevious" 
+                        wire:keydown.enter="selectHighlighted" 
+                        placeholder="Search Customer" 
+                        class="w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        
+                    <input wire:model.live="search_by" type="text" name="search_by" id="search_by" hidden>
+                    
+                    @if (!empty($search_by_query) && $search_by_query_status !== 'selected')
+                        <ul class="list-group absolute z-10 bg-white border w-full mt-1 rounded shadow">
+                            @if (!empty($customers))
+                                @foreach ($customers as $index => $data)
+                                    <li>
+                                        <a class="py-2 px-3 list-group-item hover:bg-slate-100 cursor-pointer @if($highlightIndex === $index) bg-blue-100 @endif" 
+                                        wire:click.prevent="sbSelect({{ $data['id'] }})" 
+                                        data-index="{{ $index }}">
+                                            {{ $data['customer_name'] }} | {{ $data['phone'] }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @else
+                                <div class="py-2 px-3 hover:bg-slate-100 w-full cursor-pointer">No data!</div>
+                            @endif
+                        </ul>
+                    @endif
+                </div>
+
                 @error('customer_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
@@ -38,7 +64,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($requestItems as $index => $item)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            {{-- <td class="px-6 py-4 whitespace-nowrap">
                                 <select wire:model="requestItems.{{ $index }}.product_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm"
                                 >
                                     <option value="">Select Product</option>
@@ -47,7 +73,40 @@
                                     @endforeach
                                 </select>
                                 @error("requestItems.$index.product_id") <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                            </td>
+                            </td> --}}
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                <div class="relative">
+                                    <input type="text"
+                                        placeholder="Search Product"
+                                        class="w-full text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        wire:model.live.debounce.500ms="requestItems.{{ $index }}.product_search"
+                                        wire:keydown.arrow-down="highlightProductNextWrapper({{ $index }})"
+                                        wire:keydown.arrow-up="highlightProductPreviousWrapper({{ $index }})"
+                                        wire:keydown.enter="selectHighlightedProductWrapper({{ $index }})"
+                                    >
+                            
+                                    <input type="hidden" wire:model.live="requestItems.{{ $index }}.product_id">
+                            
+                                    @if (!empty($requestItems[$index]['product_search']) && $requestItems[$index]['search_status'] !== 'selected')
+                                        <ul class="absolute z-10 bg-white border w-full mt-1 rounded shadow">
+                                            @if (!empty($requestItems[$index]['search_results']))
+                                                @foreach ($requestItems[$index]['search_results'] as $pIndex => $product)
+                                                    <li wire:click.prevent="selectProductWrapper({{ $index }}, {{ $product['id'] }})"
+                                                        class="px-3 py-2 hover:bg-slate-100 cursor-pointer @if($requestItems[$index]['highlight_index'] === $pIndex) bg-blue-100 @endif">
+                                                        {{ $product['name'] }} ({{ $product['product_code'] }})
+                                                    </li>
+                                                @endforeach
+                                            @else
+                                                <li class="px-3 py-2 text-gray-500">No products found</li>
+                                            @endif
+                                        </ul>
+                                    @endif
+                            
+                                    @error("requestItems.$index.product_id")
+                                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </td> 
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <input type="number" wire:model.live="requestItems.{{ $index }}.quantity" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
                                 @error("requestItems.$index.quantity") <span class="text-red-500 text-sm">{{ $message }}</span> @enderror

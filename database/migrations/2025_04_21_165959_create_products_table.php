@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('barcode')->nullable();
             $table->string('image')->nullable();
-            $table->decimal('mrp', 10, 2)->nullable();     
+            $table->decimal('mrp', 10, 2)->nullable();   
+            $table->decimal('vendor_price', 10, 2)->nullable();     
             $table->decimal('selling_price', 10, 2)->nullable();     
             $table->string('gst_percentage')->nullable();
             $table->string('hsn_code')->nullable(); 
