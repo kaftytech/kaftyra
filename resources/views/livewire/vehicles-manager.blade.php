@@ -3,23 +3,25 @@
         @if($showForm)
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded shadow">
                 <x-input label="Vehicle Number" name="vehicle_number" wire:model.defer="vehicle_number" />
+                @error('vehicle_number')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
                 <x-input label="Vehicle Type" name="type" wire:model.defer="type" placeholder="e.g., Truck, Van, Bike" />
+                @error('type')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
                 <x-input label="Driver Name" name="driver_name" wire:model.defer="driver_name" />
+                @error('driver_name')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
                 <x-input label="Driver Contact" name="driver_contact" wire:model.defer="driver_contact" />
+                @error('driver_contact')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
     
                 <div class="col-span-2">
                     <x-textarea label="Notes" name="notes" wire:model.defer="notes" />
-                </div>
-    
-                {{-- <div class="col-span-2">
-                    <x-select label="Branch" name="branch_id" wire:model.defer="branch_id">
-                        <option value="">Select Branch</option>
-                        @foreach($branches as $branch)
-                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                        @endforeach
-                    </x-select>
-                </div> --}}
-    
+                </div>    
                 <div class="col-span-2 flex justify-end gap-2">
                     <x-button wire:click="save">Save</x-button>
                     <x-button wire:click="$set('showForm', false)" color="secondary">Cancel</x-button>

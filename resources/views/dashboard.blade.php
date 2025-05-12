@@ -7,7 +7,7 @@
       <div class="flex justify-between items-center mb-8">
         <div>
           <h1 class="text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
-          <p class="text-gray-600">Welcome back, Admin</p>
+          <p class="text-gray-600">Welcome back, Admin {{session('current_branch_id')}}</p>
         </div>
         <div class="flex items-center space-x-4">
           <div class="relative">

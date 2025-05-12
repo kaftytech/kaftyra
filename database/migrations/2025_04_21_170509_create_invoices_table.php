@@ -37,6 +37,7 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id')->nullable(); // user who created the invoice
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->timestamps();
             $table->softDeletes(); // For soft delete functionality
         });

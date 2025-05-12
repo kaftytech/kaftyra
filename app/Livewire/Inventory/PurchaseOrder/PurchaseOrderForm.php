@@ -26,6 +26,7 @@ class PurchaseOrderForm extends Component
     public $status = 'pending';
     public $notes;
     public $productSearch = '';
+    public $branch_id;
 
     public $purchaseOrderItems = [];
     public $vendors = [];
@@ -55,6 +56,7 @@ class PurchaseOrderForm extends Component
 
     public function mount($purchaseOrderId = null)
     {   
+        $this->branch_id = auth()->user()->currentBranch->id ?? null;
         if ($purchaseOrderId) {
             $purchaseOrder = PurchaseOrder::with('orderItems.product')->findOrFail($purchaseOrderId);
             $this->loadPurchaseOrder($purchaseOrderId);
@@ -73,7 +75,6 @@ class PurchaseOrderForm extends Component
         } else {
             $this->po_date = today()->format('Y-m-d');
             $this->taxes = TaxSetting::where('is_active', true)->get();
-
             foreach ($this->taxes as $tax) {
                 $this->selectedTaxes[$tax->name] = false; // initially unselected
                 $this->taxValues[$tax->name] = $tax->rate; // default from DB
@@ -123,7 +124,7 @@ class PurchaseOrderForm extends Component
                 'tax_percentage' => (float) $item->tax_percentage ?? 0, // Cast to float
                 'tax_amount' => (float) $item->tax_amount ?? 0, // Cast to float
                 'net_total' => (float) $item->net_total ?? 0, // Cast to float
-                'available_stock' => (int) $item->product->currentStock(), // Cast to integer
+                'available_stock' => (int) $item->product->currentStock($this->branch_id), // Cast to integer
                 'price_after_tax' => (float) $item->price_after_tax ?? 0, // Cast to float
             ];
             
@@ -243,8 +244,8 @@ class PurchaseOrderForm extends Component
     
     public function calculateItemTotal($index)
     {
-        $quantity = $this->purchaseOrderItems[$index]['quantity'];
-        $price = $this->purchaseOrderItems[$index]['price'];
+        $quantity = (int) $this->purchaseOrderItems[$index]['quantity'] ?? 0;
+        $price = (float) $this->purchaseOrderItems[$index]['price'] ?? 0;
         $discountType = $this->purchaseOrderItems[$index]['discount_type'] ?? 'fixed';
         $discount = $this->purchaseOrderItems[$index]['discount'] ?? 0;
         $total = $quantity * $price;
@@ -397,7 +398,7 @@ class PurchaseOrderForm extends Component
                     'notes' => $this->notes,
                     'status' => $this->status,
                     'payment_method' => $this->payment_method,
-                    'branch_id' => 1,
+                    'branch_id' => $this->branch_id,
                     'created_by' => Auth::id(),
                  ]
              );
@@ -410,14 +411,12 @@ class PurchaseOrderForm extends Component
              $purchaseOrder->orderItems()->delete();
              foreach ($this->purchaseOrderItems as $item) {
                 $product = Product::find($item['product_id']);
-            
                 // If delivered, adjust stock
                 if ($isDelivered) {
                     if (isset($originalItems[$item['product_id']])) {
-                        $originalQty = $originalItems[$item['product_id']]->quantity;
                         $newQty = $item['quantity'];
-                        $qtyDifference = $newQty - $originalQty;
-            
+                        $qtyDifference = $newQty;
+                        
                         if ($qtyDifference !== 0) {
                             if ($qtyDifference > 0) {
                                 $product->stockIn($qtyDifference, $purchaseOrder, 'Purchase Order update - extra items received');

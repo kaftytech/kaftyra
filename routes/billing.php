@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Billing\InvoiceController;
+use App\Http\Controllers\Billing\CreditNoteController;
 
 use App\Http\Controllers\Billing\PaymentController;
 
@@ -17,3 +18,14 @@ Route::group(['prefix' => 'invoices'], function() {
     Route::get('/convert/{order}', [InvoiceController::class, 'convertInvoice'])->name('convert.invoice');
 
 });
+
+Route::group(['prefix'=>'credit-notes'], function() {
+    Route::get('/', [InvoiceController::class, 'creditNoteIndex'])->name('credit-notes.index');
+    Route::get('/create/{invoice}', [CreditNoteController::class, 'createCreditNote'])->name('credit-notes.create');
+});
+
+Route::group(['prefix' => 'payments'], function() {
+    Route::get('/', [PaymentController::class, 'index'])->name('payments.index');
+});
+
+Route::get('/transactions', [PaymentController::class, 'transactionIndex'])->name('transactions.index');

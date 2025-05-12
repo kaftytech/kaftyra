@@ -45,6 +45,8 @@ class Customers extends Model
         'contact_address',
         'notes',
         'lead_id',
+        'branch_id',
+        'user_id',
         'created_by',
         'updated_by',
         // Add other fields as needed

@@ -20,6 +20,12 @@
 
             <!-- Start Number input with rounded corners and consistent styling -->
             <div>
+                <input type="number" wire:model.defer="settings.{{ $model }}.number_digits"
+                       class="border border-gray-300 text-gray-700 p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                       placeholder="5">
+            </div>
+
+            <div>
                 <input type="number" wire:model.defer="settings.{{ $model }}.start_number"
                        class="border border-gray-300 text-gray-700 p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                        placeholder="Start Number">

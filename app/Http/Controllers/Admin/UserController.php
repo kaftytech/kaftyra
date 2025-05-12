@@ -109,7 +109,7 @@ class UserController extends Controller
             // Remove the key if its value is null
             return $value !== null;
         });
-        $input['opt_in'] = @$request->opt_in == "on" ? 1 : 0;
+        // $input['opt_in'] = @$request->opt_in == "on" ? 1 : 0;
         $input['password'] = isset($request->changed_password)&&$request->changed_password!==NULL ? Hash::make($request->changed_password) : NULL;
         // dd($input);
         $originalValues = $user->getOriginal();

@@ -30,6 +30,7 @@ class VendorImport implements ToModel, WithHeadingRow
             'contact_phone' => $row['contact_phone'],
             'contact_mobile' => $row['contact_mobile'],
             'contact_address' => $row['contact_address'],
+            'branch_id' => auth()->user()->currentBranch->id
         ]);
     }
 }

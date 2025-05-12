@@ -4,16 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use thiagoalessio\TesseractOCR\TesseractOCR;
+use App\Models\User;
 class TestController extends Controller
 {
 
+    public function index()
+    {
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->account()->create([
+                'balance'        => 0.00,
+            ]);
+        }
+        dd($users);
+    }
     public function store(Request $request)
     {
         // dd($request->all());
         // $request->validate([
         //     'invoice_file' => 'required|file|mimes:jpg,jpeg,png,pdf',
         // ]);
-
+       
         $path = $request->file('invoice_file')->store('invoices', 'public');
 
         $fullPath = storage_path('app/public/' . $path);

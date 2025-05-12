@@ -49,10 +49,6 @@
                     <option value="delivered">Delivered</option>
                 </select>
             </div>
-            <div>
-                <x-textarea label="Notes" name="notes" wire:model.live="notes" />
-                @error('request_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
         </div>
        
         <!-- Request Items -->

@@ -1,7 +1,9 @@
-<div class="p-6 sm:p-8 bg-gray-50 min-h-screen">
+@props(['auditLogs'])
+
+<div class="p-4 sm:p-4 bg-gray-50 min-h-screen">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
-        <h2 class="text-3xl font-bold text-gray-900">Audit Logs</h2>
+        <h2 class="text-3xl font-bold text-gray-900">Logs</h2>
         {{-- <div class="mt-4 sm:mt-0">
             <input
                 type="text"

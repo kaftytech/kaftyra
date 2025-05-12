@@ -20,6 +20,7 @@ class PrefixSettingsSeeder extends Seeder
                 'start_number' => 1,
                 'current_number' => 1,
                 'auto_increment' => true,
+                'number_digits' => 5,
             ],
             [
                 'prefix_for' => 'Purchase',
@@ -28,6 +29,7 @@ class PrefixSettingsSeeder extends Seeder
                 'start_number' => 1,
                 'current_number' => 1,
                 'auto_increment' => true,
+                'number_digits' => 5,
             ],
             [
                 'prefix_for' => 'CreditNote',
@@ -36,6 +38,7 @@ class PrefixSettingsSeeder extends Seeder
                 'start_number' => 1,
                 'current_number' => 1,
                 'auto_increment' => true,
+                'number_digits' => 5,
             ],
             [
                 'prefix_for' => 'OrderRequest',
@@ -44,6 +47,34 @@ class PrefixSettingsSeeder extends Seeder
                 'start_number' => 1,
                 'current_number' => 1,
                 'auto_increment' => true,
+                'number_digits' => 5,
+            ],
+            [
+                'prefix_for' => 'Employee',
+                'prefix' => 'EMP',
+                'suffix' => null,
+                'start_number' => 1,
+                'current_number' => 1,
+                'auto_increment' => true,
+                'number_digits' => 5,
+            ],
+            [
+                'prefix_for' => 'PurchaseBill',
+                'prefix' => 'Bill',
+                'suffix' => null,
+                'start_number' => 1,
+                'current_number' => 1,
+                'auto_increment' => true,
+                'number_digits' => 5,
+            ],
+            [
+                'prefix_for' => 'VendorCredit',
+                'prefix' => 'VC',
+                'suffix' => null,
+                'start_number' => 1,
+                'current_number' => 1,
+                'auto_increment' => true,
+                'number_digits' => 5,
             ],
             // Add more if needed
         ]);

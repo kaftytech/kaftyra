@@ -34,7 +34,8 @@ class OrderRequest extends Model
         static::creating(function ($orderRequest) {
             $setting = PrefixSetting::where('prefix_for', 'OrderRequest')->first();
     
-            $number = str_pad($setting->current_number, 5, '0', STR_PAD_LEFT);
+            $digits = $setting->number_digits ?? 5;
+            $number = str_pad($setting->current_number, $digits, '0', STR_PAD_LEFT);
     
             $suffix = $setting->suffix ?? '';
             $parts = [];

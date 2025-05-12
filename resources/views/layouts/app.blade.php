@@ -77,7 +77,10 @@
                 </footer>
             </div>
         </div>        
+        @yield('js_scripts')
         @livewireScripts
+        <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
         @stack('scripts') 
     </body>
 </html>

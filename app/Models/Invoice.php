@@ -21,7 +21,7 @@ class Invoice extends Model
     }
     public function payments()
     {
-        return $this->hasMany(Payment::class);
+        return $this->morphOne(Payment::class, 'paymentable');
     }
 
     public function stockAdjustments()
@@ -41,7 +41,8 @@ class Invoice extends Model
         static::creating(function ($invoice) {
             $setting = PrefixSetting::where('prefix_for', 'Invoice')->first();
     
-            $number = str_pad($setting->current_number, 5, '0', STR_PAD_LEFT);
+            $digits = $setting->number_digits ?? 5;
+            $number = str_pad($setting->current_number, $digits, '0', STR_PAD_LEFT);
     
             $suffix = $setting->suffix ?? '';
             $parts = [];

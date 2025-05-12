@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('current_stock'); // Positive for received, negative for removed
+            $table->unsignedInteger('branch_id')->nullable();
             $table->timestamps();
             $table->softDeletes(); // For soft delete functionality
         });

@@ -102,8 +102,6 @@ class OrderRequestForm extends Component
 
     public function selectHighlightedProductWrapper($index)
     {
-        dd($this->requestItems);
-
         $this->selectHighlightedProduct($this->requestItems, $index, fn($i, $id) => $this->selectProductWrapper($i, $id));
     }
 
@@ -123,12 +121,14 @@ class OrderRequestForm extends Component
     public function submitRequest()
     {
         // dd($this->requestItems, $this->customer_id, $this->order_id, $this->request_date, $this->notes);
+        $customer = Customers::find($this->customer_id);
         $orderRequest = OrderRequest::updateOrCreate(
             ['id' => $this->orderRequestId],
             [
              'customer_id' => $this->customer_id ?? null,
              'request_date' => $this->request_date,
              'notes' => $this->notes ?? null,
+             'branch_id' => $customer->branch_id
             ]
         );
 

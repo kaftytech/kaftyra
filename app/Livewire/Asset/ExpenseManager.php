@@ -11,6 +11,7 @@ class ExpenseManager extends Component
     public $title, $amount, $note, $expense_date, $payment_mode, $status = 'pending', $transaction_id, $reference_number;
     public $expenseId = null;
     public $showForm = false;
+    public $branch_id;
 
     public function render()
     {
@@ -55,6 +56,7 @@ class ExpenseManager extends Component
                 'status' => $this->status,
                 'transaction_id' => $this->transaction_id,
                 'reference_number' => $this->reference_number,
+                'branch_id' => auth()->user()->currentBranch->id,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]
@@ -68,6 +70,7 @@ class ExpenseManager extends Component
             'amount' => $this->amount,
             'opening_balance' => 0, // Optional: calculate from account
             'closing_balance' => 0, // Optional: calculate from account
+            'branch_id' => auth()->user()->currentBranch->id,
         ]);
         
         $this->resetInputFields();

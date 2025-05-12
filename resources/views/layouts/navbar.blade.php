@@ -19,6 +19,21 @@
                 {{-- Add content here if needed (like search) --}}
             </div>
 
+            @if(auth()->user()->branches->count() > 1)
+                <form method="POST" action="{{ route('branch.switch') }}" class="px-4 py-2">
+                    @csrf
+                    <select name="branch_id" onchange="this.form.submit()"
+                        class="block w-full text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring focus:ring-blue-500">
+                        @foreach(auth()->user()->branches as $branch)
+                            <option value="{{ $branch->id }}"
+                                @if(session('current_branch_id') == $branch->id) selected @endif>
+                                {{ $branch->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            @endif
+
             <!-- Right: Notification + Profile -->
             <div class="flex items-center space-x-4">
                 <!-- Notification -->

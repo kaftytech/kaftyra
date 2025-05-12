@@ -28,6 +28,7 @@ class InvoiceTable extends Component
     public $errorMessage = '';
     public $salesmen = [];
     public $vehicles = [];
+    public $branch_id;
 
     public function shipping($invoiceId)
     {
@@ -84,6 +85,7 @@ class InvoiceTable extends Component
                 'notes' => $this->shippingData['notes'] ?? null,
                 'assigned_to' => $this->shippingData['assigned_to'] ?? null,
                 'created_by' => auth()->id(),
+                'branch_id' => $this->branch_id,
             ]);
         }
 
@@ -119,16 +121,16 @@ class InvoiceTable extends Component
                 $this->errorMessage = 'Payment amount cannot be greater than due amount';
                 return;
             }
-            $payment = Payment::create([
-                'invoice_id' => $invoice->id,
+            $payment = $invoice->payments()->create([
                 'amount' => $data['amount'],
                 'payment_date' => $data['payment_date'],
                 'payment_method' => 'cash', // or dynamic if you want
-                'status' => 'completed',
+                'status' => 'paid',
                 'transaction_id' => $data['transaction_id'],
                 'reference_number' => $data['reference_number'],
                 'notes' => $data['notes'],
                 'created_by' => auth()->id(),
+                'branch_id' => $this->branch_id,
             ]);
     
             $lastTransaction = Transaction::latest()->first();
@@ -142,6 +144,7 @@ class InvoiceTable extends Component
                 'amount' => $data['amount'],
                 'opening_balance' => $opening,
                 'closing_balance' => $closing,
+                'branch_id' => $this->branch_id,
             ]);
     
             $invoice->update([
@@ -182,7 +185,8 @@ class InvoiceTable extends Component
 
     public function render()
     {
-        $invoices = Invoice::paginate(10);
+        $this->branch_id = auth()->user()->currentBranch->id ?? null;
+        $invoices = Invoice::where('branch_id', $this->branch_id)->paginate(10);
         return view('livewire.billing.invoice-table', [
             'invoices' => $invoices,
         ]);

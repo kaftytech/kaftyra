@@ -7,6 +7,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PO #</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bill Status</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">vendor</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created at</th>
@@ -20,6 +21,7 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->po_number }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->po_date }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->total_amount }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->bill_status }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->status }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->vendor?->company_name }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $order->created_at }}</td>

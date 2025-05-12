@@ -15,6 +15,8 @@ class PrefixSettingForm extends Component
         'CreditNote' => 'Credit Note',
         'OrderRequest' => 'Order Request',
         'Employee' => 'Employee',
+        'PurchaseBill' => 'Purchase Bill',
+        'VendorCredit' => 'Vendor Credit',
     ];    
 
     public function mount()
@@ -27,6 +29,7 @@ class PrefixSettingForm extends Component
                 'prefix' => $setting->prefix ?? $this->defaultPrefix($model),
                 'suffix' => $setting->suffix ?? '',
                 'start_number' => $setting->start_number ?? 1,
+                'number_digits' => $setting->number_digits ?? 5
             ];
         }
     }
@@ -42,6 +45,7 @@ class PrefixSettingForm extends Component
                 'suffix' => $this->settings[$model]['suffix'],
                 'start_number' => $this->settings[$model]['start_number'],
                 'current_number' => $this->settings[$model]['start_number'],
+                'number_digits' => $this->settings[$model]['number_digits'] ?? 5,
             ]
         );
 
@@ -57,6 +61,8 @@ class PrefixSettingForm extends Component
             'CreditNote' => 'CRN',
             'OrderRequest' => 'ORD',
             'Employee' => 'EMP',
+            'PurchaseBill' => 'Bill',
+            'VendorCredit' => 'VC',
             default => '',
         };
     }

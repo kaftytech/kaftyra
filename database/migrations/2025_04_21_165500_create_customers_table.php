@@ -13,43 +13,47 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            // Personal Details
             $table->string('customer_name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->text('address_line_1')->nullable();
-            $table->text('address_line_2')->nullable();
+            $table->string('profile_picture')->nullable();
+            $table->text('contact_address')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('country')->nullable();
             $table->string('zip_code')->nullable();
+
+            // Company Details
+            $table->string('company_name')->nullable();
+            $table->text('address_line_1')->nullable();
+            $table->text('address_line_2')->nullable();
             $table->string('vat_number')->nullable();
             $table->string('gst_number')->nullable();
+            $table->string('website_url')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('rating')->nullable();
+
+            // Bank Details
             $table->string('bank_account_number')->nullable();
             $table->string('bank_name')->nullable();
             $table->string('bank_branch')->nullable();
             $table->string('bank_ifsc_code')->nullable();
-            $table->string('bank_swift_code')->nullable();
             $table->string('bank_account_holder_name')->nullable();
             $table->string('bank_account_type')->nullable();
+
+            // Payment Details
             $table->string('payment_terms')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('currency')->nullable();
+
+            // Misc
             $table->string('status')->default('active'); // Active, inactive, blocked
             $table->string('type')->default('customer'); // Customer, client, contractor
-            $table->string('rating')->nullable(); // Rating of the customer
-            $table->string('category')->nullable(); // Category of the customer
-            $table->string('tags')->nullable(); // Tags for the customer
-            $table->string('website_url')->nullable(); // Website URL of the customer
-            $table->string('social_media_links')->nullable(); // Social media links of the customer
-            $table->string('logo')->nullable(); // Logo of the customer
-            $table->string('profile_picture')->nullable(); // Profile picture of the customer
-            $table->string('contact_person')->nullable();
-            $table->string('contact_email')->nullable(); // Contact email of the customer
-            $table->string('contact_phone')->nullable(); // Contact phone of the customer
-            $table->string('contact_mobile')->nullable(); // Contact mobile of the customer
-            $table->string('contact_address')->nullable(); // Contact address of the customer
-            $table->string('notes')->nullable(); // Notes about the customer
-            $table->foreignId('lead_id')->nullable()->constrained()->nullOnDelete(); // Optional link to lead
+            $table->text('notes')->nullable();
+
+            // Foreign Keys
+            $table->foreignId('lead_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

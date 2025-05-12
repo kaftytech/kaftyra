@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -32,7 +35,25 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+        Fortify::authenticateUsing(function (Request $request) {
+            $user = User::where('email', $request->email)->first();
+            // dd($user);
+            if ($user && Hash::check($request->password, $user->password)) {
+                // If user has only one branch, set it as default
+                if (!$user->branch_id && $user->branches()->count() === 1) {
+                    $user->branch_id = $user->branches()->first()->id;
+                    $user->save();
+                }
 
+                // Store in session
+                if ($user->branch_id) {
+                    Session::put('current_branch_id', $user->branch_id);
+                }
+
+                return $user;
+            }
+            return null;
+        });
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 

@@ -105,7 +105,11 @@
                                     <td class="px-4 py-2">{{ $item->product->product_code ?? '-' }}</td>
                                     <td class="px-4 py-2">{{ number_format($item->price, 2) }}</td>
                                     <td class="px-4 py-2">{{ $item->quantity }}</td>
-                                    <td class="px-4 py-2">{{ number_format($item->discount ?? 0, 2) }}</td>
+                                    @if($item->discount_type == 'percentage')
+                                        <td class="px-4 py-2">{{ $item->discount_amount . ' (' . $item->discount . '%)' ?? '0' }}</td>
+                                    @else
+                                        <td class="px-4 py-2">{{ number_format($item->discount_amount, 2) }}</td>
+                                    @endif
                                     <td class="px-4 py-2">
                                         {{ number_format($item->tax_amount ?? 0, 2) }}
                                         <span class="text-xs text-gray-400">({{ $item->tax_percentage ?? 0 }}%)</span>

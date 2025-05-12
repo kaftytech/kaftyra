@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->morphs('accountable');
-            $table->decimal('balance',10,2)->default(0.00); 
+            $table->decimal('balance',10,2)->default(0.00);
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->timestamps();
         });
     }

@@ -254,13 +254,19 @@
                                                 <option value="percentage">%</option>
                                                 <option value="fixed">₹</option>
                                             </select>
-                                    
-                                            <!-- Discount Input Field -->
-                                            <input type="number" step="0.01"
-                                                wire:model.live="invoiceItems.{{ $index }}.discount"
-                                                class="rounded-e-md border border-l-0 border-gray-300 text-sm w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500" 
-                                                placeholder="Discount">
-                                    
+                                            @if($invoiceItems[$index]['discount_type'] === 'percentage')
+                                                <!-- Discount Input Field -->
+                                                <input type="number" step="0.01"
+                                                    wire:model.live="invoiceItems.{{ $index }}.discount"
+                                                    class="rounded-e-md border border-l-0 border-gray-300 text-sm w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500" 
+                                                    placeholder="Discount">
+                                            @elseif($invoiceItems[$index]['discount_type'] === 'fixed')
+                                                <!-- Discount Input Field -->
+                                                <input type="number" step="0.01"
+                                                    wire:model.live="invoiceItems.{{ $index }}.discount_amount"
+                                                     class="rounded-e-md border border-l-0 border-gray-300 text-sm w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500" 
+                                                    placeholder="Discount">
+                                            @endif
                                         </div>
                                     
                                         <!-- Validation Errors -->
@@ -373,10 +379,12 @@
                                         </div>
                                     </div>
                                     <div class="text-sm font-medium text-gray-900 text-right">
-                                        {{ $discount_type == 'percentage' ? 
-                                            number_format(($subtotal * $discount / 100), 2) : 
-                                            number_format($discount, 2) }}
-                                    </div>
+                                        {{
+                                            $discount_type == 'percentage'
+                                            ? number_format(((float)$subtotal * (float)$discount / 100), 2)
+                                            : number_format((float)$discount, 2)
+                                        }}
+                                    </div>                                    
                                 </div>
                                 @foreach($taxes as $tax)
                                 <div class="grid grid-cols-2 gap-2 py-2">

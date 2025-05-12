@@ -9,7 +9,6 @@ use Livewire\Component;
 class VehiclesManager extends Component
 {
     public $vehicles;
-    public $branches;
 
     public $vehicle_id;
     public $vehicle_number;
@@ -23,13 +22,13 @@ class VehiclesManager extends Component
 
     public function mount()
     {
+        $this->branch_id = auth()->user()->currentBranch->id;
         $this->loadVehicles();
-        $this->branches = Branch::all();
     }
 
     public function loadVehicles()
     {
-        $this->vehicles = Vehicle::with('branch')->latest()->get();
+        $this->vehicles = Vehicle::where('branch_id', $this->branch_id)->latest()->get();
     }
 
     public function create()
@@ -47,8 +46,7 @@ class VehiclesManager extends Component
         $this->driver_name = $vehicle->driver_name;
         $this->driver_contact = $vehicle->driver_contact;
         $this->notes = $vehicle->notes;
-        $this->branch_id = $vehicle->branch_id;
-
+        
         $this->showForm = true;
     }
 
@@ -56,10 +54,9 @@ class VehiclesManager extends Component
     {
         $this->validate([
             'vehicle_number' => 'required|unique:vehicles,vehicle_number,' . $this->vehicle_id,
-            'type' => 'nullable|string|max:100',
-            'driver_name' => 'nullable|string|max:255',
-            'driver_contact' => 'nullable|string|max:20',
-            'branch_id' => 'nullable|exists:branches,id',
+            'type' => 'required|string|max:100',
+            'driver_name' => 'required|string|max:255',
+            'driver_contact' => 'required|string|max:20',
         ]);
 
         Vehicle::updateOrCreate(
@@ -93,7 +90,7 @@ class VehiclesManager extends Component
         $this->driver_name = '';
         $this->driver_contact = '';
         $this->notes = '';
-        $this->branch_id = null;
+        $this->branch_id = auth()->user()->currentBranch->id; // keep branch_id    
     }
 
     public function render()

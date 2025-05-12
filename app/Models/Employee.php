@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PrefixSetting;
+use App\Traits\HasAuditLog;
 
 class Employee extends Model
 {
+    use HasAuditLog;
     protected $guarded = [];
 
     protected static function booted()
@@ -16,7 +18,8 @@ class Employee extends Model
         static::creating(function ($employee) {
             $setting = PrefixSetting::where('prefix_for', 'Employee')->first();
     
-            $number = str_pad($setting->current_number, 5, '0', STR_PAD_LEFT);
+            $digits = $setting->number_digits ?? 5;
+            $number = str_pad($setting->current_number, $digits, '0', STR_PAD_LEFT);
     
             $suffix = $setting->suffix ?? '';
             $parts = [];
@@ -38,5 +41,13 @@ class Employee extends Model
             // Increment the current number
             $setting->increment('current_number');
         });
+    }
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditlogable');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -21,7 +21,9 @@ class VendorController extends Controller
     }
     public function store(Request $request)
     {
-        $vendor = Vendors::create($request->all());
+        $input = $request->except(['_token', '_method']);
+        $input['branch_id'] = auth()->user()->currentBranch->id;
+        $vendor = Vendors::create($input);
 
         return redirect()->route('vendors.index')->with('success', 'Vendor created successfully.');
     }

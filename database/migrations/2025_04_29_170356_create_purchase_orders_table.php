@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->nullOnDelete();
             $table->string('po_number')->unique(); // e.g., PO-2024-001
             $table->date('po_date');
+            $table->enum('bill_status',['unbilled', 'billed'])->default('unbilled');
             $table->enum('status', ['pending', 'delivered', 'rejected', 'cancelled'])->default('pending');
             $table->decimal('total_amount', 15, 2);
             $table->enum('discount_type', ['percentage', 'fixed','free']);

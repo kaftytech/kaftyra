@@ -61,6 +61,7 @@ class InvoiceForm extends Component
     
     public $product_id;
     public $customer;
+    public $branch_id;
 
     protected $rules = [
         'invoice_number' => 'required|unique:invoices,invoice_number',
@@ -120,7 +121,7 @@ class InvoiceForm extends Component
             }
         } else {
             $this->taxes = TaxSetting::where('is_active', true)->get();
-
+            $this->branch_id = auth()->user()->currentBranch->id ?? null;
             foreach ($this->taxes as $tax) {
                 $this->selectedTaxes[$tax->name] = false; // initially unselected
                 $this->taxValues[$tax->name] = $tax->rate; // default from DB
@@ -174,7 +175,7 @@ class InvoiceForm extends Component
                 'tax_percentage' => (float) $item->tax_percentage ?? 0, // Cast to float
                 'tax_amount' => (float) $item->tax_amount ?? 0, // Cast to float
                 'net_total' => (float) $item->net_total ?? 0, // Cast to float
-                'available_stock' => (int) $item->product->currentStock(), // Cast to integer
+                'available_stock' => (int) $item->product->currentStock($this->branch_id), // Cast to integer
                 'price_after_tax' => (float) $item->price_after_tax ?? 0, // Cast to float
             ];
             
@@ -192,7 +193,9 @@ class InvoiceForm extends Component
             'quantity' => 1,
             'price' => 0,
             'total' => 0,
+            'discount_type' => 'fixed',
             'discount' => 0,
+            'discount_amount' => 0,
             'tax' => 0,
             'net_total' => 0,
             'available_stock' => 0,
@@ -230,7 +233,7 @@ class InvoiceForm extends Component
             $this->invoiceItems[$index]['product_code'] = $item->product->product_code;
             $this->invoiceItems[$index]['quantity'] = $item->quantity;
             $this->invoiceItems[$index]['price'] = $item->product->selling_price;
-            $this->invoiceItems[$index]['available_stock'] = $item->product->currentStock();
+            $this->invoiceItems[$index]['available_stock'] = $item->product->currentStock($this->branch_id);
             $this->invoiceItems[$index]['total'] = $item->quantity * $item->product->selling_price;
             $this->invoiceItems[$index]['tax_percentage'] = $item->product->gst_percentage;
             $this->invoiceItems[$index]['product_search'] = $item->product->name . ' (' . $item->product->product_code . ')';
@@ -248,7 +251,7 @@ class InvoiceForm extends Component
         $parts = explode('.', $index);
     
         // Handle quantity, price, discount update
-        if (count($parts) == 2 && in_array($parts[1], ['quantity', 'price', 'discount'])) {
+        if (count($parts) == 2 && in_array($parts[1], ['quantity', 'price', 'discount','discount_amount'])) {
             $this->calculateItemTotal($parts[0]);
         }
     
@@ -298,8 +301,7 @@ class InvoiceForm extends Component
     public function updatedDiscount()
     {
         $this->calculateInvoice();
-    }
-    
+    }    
     public function updatedDiscountType()
     {
         $this->calculateInvoice();
@@ -327,10 +329,17 @@ class InvoiceForm extends Component
     
     public function calculateItemTotal($index)
     {
-        $quantity = $this->invoiceItems[$index]['quantity'];
-        $price = $this->invoiceItems[$index]['price'];
+        $quantity = (int) $this->invoiceItems[$index]['quantity'] ?? 0;
+        $price = (float) $this->invoiceItems[$index]['price'] ?? 0;
         $discountType = $this->invoiceItems[$index]['discount_type'] ?? 'fixed';
-        $discount = $this->invoiceItems[$index]['discount'] ?? 0;
+        // dd($this->invoiceItems[$index]['discount_amount']);
+        if($discountType == 'percentage') {            
+            $discount = (int) $this->invoiceItems[$index]['discount'] ?? 0;
+        }
+        elseif($discountType == 'fixed')
+        {
+            $discount = $this->invoiceItems[$index]['discount_amount'] ?? 0;
+        }
         $total = $quantity * $price;
         $discountPercentage = '';
         $discountAmount = 0;
@@ -461,7 +470,7 @@ class InvoiceForm extends Component
             // Check if items have sufficient stock
             foreach ($this->invoiceItems as $index => $item) {
                 $product = Product::find($item['product_id']);
-                $availableStock = $product->currentStock();
+                $availableStock = $product->currentStock($this->branch_id);
                 // dd($availableStock);
                 // Get the existing item if editing
                 $existingItem = isset($item['id']) ? InvoiceItem::find($item['id']) : null;
@@ -614,6 +623,7 @@ class InvoiceForm extends Component
                     'notes' => $this->notes,
                     'payment_method' => $this->payment_method,
                     'seller_id' => Auth::id(),
+                    'branch_id' => $this->branch_id
                 ]
             );
 
@@ -694,6 +704,7 @@ class InvoiceForm extends Component
                         $product->stockIn($item->quantity, $invoice, 'Invoice update - product removed');
                     }
                 } else {
+                     $invoice->items()->delete();
                     // New locked invoice - simply deduct stock for all items
                     foreach ($this->invoiceItems as $item) {
                         // Create the invoice item
@@ -719,6 +730,7 @@ class InvoiceForm extends Component
 
                 }
             } else {
+                 $invoice->items()->delete();
                 // For non-locked invoices (draft or quotation), just create items without stock adjustments
                 foreach ($this->invoiceItems as $item) {
                     $invoiceItem = InvoiceItem::create([

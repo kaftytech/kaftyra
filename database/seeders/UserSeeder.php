@@ -16,83 +16,59 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Admin User
-        $admin = [
-            'name' => "Admin User",
-            'email' => "admin@gmail.com",
-            'password' => Hash::make("kafty1234"),
-            'email_verified_at' => Carbon::now(),
+        $users = [
+            [
+                'name' => 'Super Admin',
+                'email' => 'superadmin@gmail.com',
+                'role' => 'super_admin',
+                'branch_id' => 1
+            ],
+            [
+                'name' => 'Admin User',
+                'email' => 'admin@gmail.com',
+                'role' => 'admin',
+                'branch_id' => 1
+            ],
+            [
+                'name' => 'Store Keeper',
+                'email' => 'storekeeper@gmail.com',
+                'role' => 'store_keeper',
+                'branch_id' => 1
+            ],
+            [
+                'name' => 'Sales User',
+                'email' => 'sales@gmail.com',
+                'role' => 'sales_man',
+                'branch_id' => 1
+            ],
+            [
+                'name' => 'Accounts User',
+                'email' => 'accounts@gmail.com',
+                'role' => 'accountant',
+                'branch_id' => 1
+            ],
+            [
+                'name' => 'Customer User',
+                'email' => 'customer@gmail.com',
+                'role' => 'customer',
+                'branch_id' => 1
+            ],
         ];
 
-        $admin = User::create($admin);
+        foreach ($users as $userData) {
+            $user = User::create([
+                'name' => $userData['name'],
+                'email' => $userData['email'],
+                'password' => Hash::make('kafty1234'),
+                'email_verified_at' => Carbon::now(),
+                'branch_id' => $userData['branch_id']
+            ]);
 
-        // Find the admin role
-        $adminRole = Role::where('name', 'admin')->first();
+            $role = Role::firstOrCreate(['name' => $userData['role']]);
+            
+            // Attach role using Laratrust
+            $user->roles()->attach($role->id, ['user_type' => \App\Models\User::class]);
 
-        // Check if the admin role exists and attach it to the user with 'user_type'
-        if ($adminRole) {
-            // Attach the admin role to the user with the 'user_type' field
-            $admin->roles()->attach($adminRole, ['user_type' => \App\Models\User::class]);
-        } else {
-            // If the 'admin' role doesn't exist, create it and attach it with 'user_type'
-            $adminRole = Role::create(['name' => 'admin']);
-            $admin->roles()->attach($adminRole, ['user_type' => \App\Models\User::class]);
-        }
-
-        // Example: Create a customer user and assign the 'customer' role
-        $customer = [
-            'name' => "Customer User",
-            'email' => "customer@gmail.com",
-            'password' => Hash::make("kafty1234"),
-            'email_verified_at' => Carbon::now(),
-        ];
-
-        $customer = User::create($customer);
-
-        // Find and assign customer role with 'user_type'
-        $customerRole = Role::where('name', 'customer')->first();
-        if ($customerRole) {
-            $customer->roles()->attach($customerRole, ['user_type' => \App\Models\User::class]);
-        } else {
-            $customerRole = Role::create(['name' => 'customer']);
-            $customer->roles()->attach($customerRole, ['user_type' => \App\Models\User::class]);
-        }
-
-        // Example: Create a customer user and assign the 'customer' role
-        $salesUser = [
-            'name' => "Sales User",
-            'email' => "salesUser@gmail.com",
-            'password' => Hash::make("kafty1234"),
-            'email_verified_at' => Carbon::now(),
-        ];
-
-        $salesUser = User::create($salesUser);
-
-        // Find and assign salesUser role with 'user_type'
-        $salesUserRole = Role::where('name', 'sales')->first();
-        if ($salesUserRole) {
-            $salesUser->roles()->attach($salesUserRole, ['user_type' => \App\Models\User::class]);
-        } else {
-            $salesUserRole = Role::create(['name' => 'sales']);
-            $salesUser->roles()->attach($salesUserRole, ['user_type' => \App\Models\User::class]);
-        }
-
-        $storeKeeper = [
-            'name' => "Sales User",
-            'email' => "storeKeeper@gmail.com",
-            'password' => Hash::make("kafty1234"),
-            'email_verified_at' => Carbon::now(),
-        ];
-
-        $storeKeeper = User::create($storeKeeper);
-
-        // Find and assign storeKeeper role with 'user_type'
-        $storeKeeperRole = Role::where('name', 'store_keeper')->first();
-        if ($storeKeeperRole) {
-            $storeKeeper->roles()->attach($storeKeeperRole, ['user_type' => \App\Models\User::class]);
-        } else {
-            $storeKeeperRole = Role::create(['name' => 'store_keeper']);
-            $storeKeeper->roles()->attach($storeKeeperRole, ['user_type' => \App\Models\User::class]);
         }
     }
 }

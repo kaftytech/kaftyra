@@ -10,6 +10,7 @@ trait HandlesVendorSelection
     public $search_by;
     public $search_by_query_status = '';
     public $highlightIndex = 0;
+
     // Function to handle query updates
     public function updatedSearchByQuery()
     {

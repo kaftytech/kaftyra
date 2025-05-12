@@ -7,6 +7,7 @@ use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\StockController;
 use App\Http\Controllers\Inventory\VendorController;
 use App\Http\Controllers\Inventory\PurchaseOrderController;
+use App\Http\Controllers\Inventory\PurchaseBillController;
 
 
 Route::group(['prefix' => 'units'], function() {
@@ -71,4 +72,16 @@ Route::group(['prefix' => 'purchase-orders'], function() {
     Route::get('/{purchaseOrder}/edit', [PurchaseOrderController::class, 'edit'])->name('purchase-orders.edit');
     Route::post('/{purchaseOrder}', [PurchaseOrderController::class, 'update'])->name('purchase-orders.update');
     Route::delete('/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])->name('purchase-orders.destroy');
+    Route::get('/convert-bill/{purchaseOrder}', [PurchaseOrderController::class, 'convertBill'])->name('purchase-orders.convert-bill');
+
+});
+
+Route::group(['prefix' => 'purchase-bills'], function() {
+    Route::get('/', [PurchaseBillController::class, 'index'])->name('purchase-bills.index');
+    Route::get('/create', [PurchaseBillController::class, 'create'])->name('purchase-bills.create');
+    Route::post('/', [PurchaseBillController::class, 'store'])->name('purchase-bills.store');
+    Route::get('/{purchaseBill}', [PurchaseBillController::class, 'show'])->name('purchase-bills.show');
+    Route::get('/{purchaseBill}/edit', [PurchaseBillController::class, 'edit'])->name('purchase-bills.edit');
+    Route::post('/{purchaseBill}', [PurchaseBillController::class, 'update'])->name('purchase-bills.update');
+    Route::delete('/{purchaseBill}', [PurchaseBillController::class, 'destroy'])->name('purchase-bills.destroy');
 });

@@ -19,12 +19,13 @@ class Log extends Component
      *
      * @return void
      */
-    public function __construct()
-    {
-        // You can pass pagination here if necessary or pass all audit logs
-        $this->auditLogs = AuditLog::with('user')->latest()->paginate(10);
-    }
 
+    public function __construct($auditLogs = null)
+    {
+        $this->auditLogs = $auditLogs;
+        // dd($this->auditLogs);
+
+    }
     /**
      * Get the view / contents that represent the component.
      *

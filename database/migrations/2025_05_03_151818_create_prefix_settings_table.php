@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('start_number')->default(1);
             $table->unsignedBigInteger('current_number')->default(1); // For tracking
             $table->boolean('auto_increment')->default(true);
+            $table->unsignedInteger('number_digits')->default(5); // New column for digit length
             $table->timestamps();
         });
     }

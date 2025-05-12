@@ -32,6 +32,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'branch_id',
     ];
 
     /**
@@ -77,5 +78,26 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+    public function account()
+    {  
+        return $this->morphOne(Account::class, 'accountable');
+    }
+
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditlogable');
+    }
+
+    public function branches()
+    {
+        return $this->belongsToMany(Branch::class, 'branch_users', 'user_id', 'branch_id');
+    }
+    public function currentBranch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+
 
 }

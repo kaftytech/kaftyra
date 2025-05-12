@@ -93,6 +93,11 @@
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Leads</span>
                             <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Leads">L</span>
                         </a>
+                        <a href="{{ route('customers.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('customers.index') ? 'bg-gray-700 text-white' : '' }}"
+                        :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Customers</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Customers">C</span>
+                        </a>
                         <a href="{{ route('vendors.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('leads.index') ? 'bg-gray-700 text-white' : '' }}"
                         :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Vendors</span>
@@ -174,6 +179,11 @@
                             :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Purchase Order</span>
                             <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Stocks">PO</span>
+                        </a>
+                         <a href="{{ route('purchase-bills.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('inventory.stocks') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Purchase Bills</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Stocks">PB</span>
                         </a>
                        <a href="{{ route('products.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('inventory.products') ? 'bg-gray-700 text-white' : '' }}"
                           :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
@@ -275,7 +285,7 @@
                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Invoices</span>
                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Invoices">I</span>
                        </a>
-                       <a href="#" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.payments') ? 'bg-gray-700 text-white' : '' }}"
+                       <a href="{{ route('payments.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.payments') ? 'bg-gray-700 text-white' : '' }}"
                           :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Payments</span>
                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Payments">P</span>
@@ -285,7 +295,7 @@
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Expense</span>
                             <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Expense">E</span>
                         </a>
-                        <a href="{{ route('expenses.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.payments') ? 'bg-gray-700 text-white' : '' }}"
+                        <a href="{{ route('transactions.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.payments') ? 'bg-gray-700 text-white' : '' }}"
                             :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Transaction</span>
                             <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Transaction">E</span>

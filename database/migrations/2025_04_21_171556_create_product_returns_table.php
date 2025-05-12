@@ -24,6 +24,8 @@ return new class extends Migration
             $table->text('reason')->nullable(); // overall reason
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedBigInteger('branch_id')->nullable();
+
             $table->timestamps();
             $table->softDeletes(); // For soft delete functionality
         });

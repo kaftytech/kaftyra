@@ -23,4 +23,9 @@ class PurchaseOrderController extends Controller
         $purchaseOrder = PurchaseOrder::findOrFail($id);
         return view('inventory.purchase-order.edit', compact('purchaseOrder'));
     }
+
+    public function convertBill($purchase_order_id)
+    {
+        return view('inventory.purchase-bill.create', compact('purchase_order_id'));
+    }
 }

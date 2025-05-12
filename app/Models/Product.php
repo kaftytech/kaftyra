@@ -106,7 +106,7 @@ class Product extends Model
             'note' => $note,
             'date' => now(),
             'performed_by' => auth()->id(),
-            'branch_id' => auth()->user()?->branch_id ?? null,
+            'branch_id' => auth()->user()->currentBranch->id ?? null,
         ]);
     }
     
@@ -127,7 +127,7 @@ class Product extends Model
             'change' => $change
         ]);
         
-        $branchId = auth()->user()?->branch_id ?? null;
+        $branchId = auth()->user()->currentBranch->id ?? null;
         
         // Get the current stock record
         $stockRecord = $this->stock()->first();
@@ -159,12 +159,13 @@ class Product extends Model
             ]);
             
             // Use updateOrCreate to update existing record or create a new one
-            $updatedStock = Stock::where('product_id', $this->id)->first();
+            $updatedStock = Stock::where('product_id', $this->id)->where('branch_id', $branchId)->first();
             // dd($newQuantity);
             if (!$updatedStock) {
                 $updatedStock = new Stock;
                 $updatedStock->product_id = $this->id;
                 $updatedStock->current_stock = $newQuantity;
+                $updatedStock->branch_id = $branchId;
                 $updatedStock->save();
             }
             else

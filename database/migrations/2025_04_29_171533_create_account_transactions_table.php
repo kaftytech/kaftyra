@@ -20,7 +20,8 @@ return new class extends Migration
             $table->decimal('amount', 15, 2); // Transaction amount
             $table->decimal('opening_balance', 15, 2); // Balance before the transaction
             $table->decimal('closing_balance', 15, 2); // Balance after the transaction
-            $table->string('txn_mode')->nullable();; // Transaction mode 
+            $table->string('txn_mode')->nullable(); // Transaction mode 
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->timestamps();
         });
     }

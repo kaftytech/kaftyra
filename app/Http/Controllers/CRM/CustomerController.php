@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\Customers;
 use App\Imports\CustomerImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Support\Facades\Hash;
+use DB;
 
 class CustomerController extends Controller
 {
@@ -22,12 +26,37 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        $input = $request->all();
-        Customers::create($input);
-        // Add other fields as necessary
-        // $customers->save();
-        return redirect()->route('customers.index')->with('success', 'Lead created successfully.');
+        DB::beginTransaction();
+
+        try {
+            $input = $request->all();
+            $input['branch_id'] = auth()->user()->currentBranch->id;
+            // dd($input['branch_id']);
+            // Create customer
+            $customer = Customers::create($input);
+            // dd($customer);
+            // Create related user
+            $user = User::create([
+                'name' => $input['customer_name'],
+                'email' => $input['email'],
+                'phone' => $input['phone'],
+                'password' => bcrypt('password'), // Replace with real logic
+                'branch_id' => auth()->user()->currentBranch->id
+            ]);
+
+            // Assign "customer" role
+            $userRole = Role::firstOrCreate(['name' => 'customer']);
+            $user->roles()->attach($userRole->id, ['user_type' => \App\Models\User::class]);
+
+            DB::commit();
+
+            return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to create customer: ' . $e->getMessage());
+        }
     }
+
 
     public function show($id)
     {
