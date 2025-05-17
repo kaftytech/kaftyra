@@ -330,15 +330,30 @@
                             x-transition:leave-start="transform opacity-100 scale-100"
                             x-transition:leave-end="transform opacity-0 scale-95"
                             class="pl-10 mt-1 space-y-1">
-                        <a href="{{ route('vehicles.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                        <a href="{{ route('reports.stock-summary') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
                             :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
-                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Vehicles</span>
-                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Vehicle">V</span>
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Stock Summary</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Stock Summary">SS</span>
                         </a>
-                        <a href="{{ route('expenses.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                        <a href="{{ route('reports.stock-movement') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
                             :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
-                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Expense</span>
-                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Expense">E</span>
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Stock Movement</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Stock Movement">SM</span>
+                        </a>
+                          <a href="{{ route('reports.sales-summary') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Sales Summary</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Sales Summary">SS</span>
+                        </a>
+                         <a href="{{ route('reports.top-selling-product') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Top Selling Product</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Top Selling Product">TSP</span>
+                        </a>
+                        <a href="{{ route('reports.customer-purchase-history') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Customer Purchase History</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Customer Purchase History">CPH</span>
                         </a>
                     </div>
                 </div>

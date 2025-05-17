@@ -26,7 +26,7 @@ class StockSummaryTable extends Component
 
     public function export()
     {
-        return Excel::download(new StockSummaryExport($this->branch_id, $this->category_id, $this->vendor_id), 'stock_summary.xlsx');
+        return Excel::download(new StockSummaryExport($this->branch_id, $this->category_id), 'stock_summary.xlsx');
     }
 
     public function render()

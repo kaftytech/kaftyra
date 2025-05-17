@@ -35,7 +35,7 @@ class InvoiceTable extends Component
         $this->selectedInvoice = Invoice::with('customer')->findOrFail($invoiceId);
         // $this->salesmen = User::whereRoleIs('salesman')->get(); // if you're using spatie/laravel-permission
         $this->salesmen = User::whereHas('roles', function ($query) {
-            $query->where('name', ['sales']);
+            $query->where('name', ['sales_man']);
         })->get();
         $this->vehicles = Vehicle::get();
         if($this->selectedInvoice->delivery) {
