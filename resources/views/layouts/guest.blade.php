@@ -17,10 +17,11 @@
         <!-- Styles -->
         @livewireStyles
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
+    <body style="background-image: url('/images/background.jpg'); background-size: cover; background-position: center;" class="min-h-screen font-sans text-gray-900 antialiased">
+        <div class="bg-black bg-opacity-50 min-h-screen flex items-center justify-end pr-32">
             {{ $slot }}
         </div>
+
 
         @livewireScripts
     </body>

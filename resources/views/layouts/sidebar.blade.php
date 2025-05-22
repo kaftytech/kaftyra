@@ -290,6 +290,11 @@
                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Payments</span>
                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Payments">P</span>
                        </a>
+                        <a href="{{ route('credit-notes.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                          :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                           <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Credit Notes</span>
+                           <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Credit Notes">CN</span>
+                        </a>
                        <a href="{{ route('expenses.index') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('expenses.index') ? 'bg-gray-700 text-white' : '' }}"
                             :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Expense</span>

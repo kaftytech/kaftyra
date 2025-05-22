@@ -18,8 +18,8 @@ Route::prefix('admin')->group(base_path('routes/admin.php'));
 Route::prefix('reports')->group(base_path('routes/reports.php'));
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('dashboard');
+})->middleware('auth');
 
 Route::middleware([
     'auth:sanctum',

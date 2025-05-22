@@ -12,4 +12,9 @@ class CreditNoteController extends Controller
         $invoice = Invoice::findOrFail($id);
         return view('billing.credit-notes.create')->with('invoice', $invoice);
     }
+
+    public function creditNoteIndex()
+    {
+        return view('billing.credit-notes.index');
+    }
 }

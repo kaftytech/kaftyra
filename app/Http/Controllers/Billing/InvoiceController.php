@@ -129,7 +129,7 @@ class InvoiceController extends Controller
         ];
         
         // Generate PDF using the invoice-pdf view
-        $pdf = PDF::loadView('billing.invoice.pdf', $data);
+        $pdf = PDF::loadView('billing.invoice.templates.invoice-2', $data);
         
         // Set paper size and orientation
         $pdf->setPaper('a4');
