@@ -19,6 +19,7 @@ class EmployeeProfileForm extends Component
     public $selectedEmployee;
     public $employeeId;
     public $selectedBranches = [];
+    public $selectedRoles = [];
     public $user_id, $designation, $department, $joining_date, $dob, $gender,
            $emergency_contact, $national_id, $address, $phone, $employee_name, $email;
 
@@ -34,6 +35,8 @@ class EmployeeProfileForm extends Component
         'national_id' => 'nullable|string',
         'address' => 'nullable|string',
         'phone' => 'nullable|string',
+        'selectedBranches' => 'required|array|min:1',
+        'selectedRoles' => 'required|array|min:1',
     ];
 
     public function render()
@@ -42,6 +45,7 @@ class EmployeeProfileForm extends Component
             'employees' => Employee::latest()->paginate(10),
             'users' => User::all(),
             'branches' => Branch::all(),
+            'roles' => Role::all()
         ]);
     }
     public function view($id)
@@ -87,17 +91,19 @@ class EmployeeProfileForm extends Component
         $this->editMode = true;
         $user = $employee->user;
         $this->selectedBranches = $user ? $user->branches->pluck('id')->toArray() : [];
+        $this->selectedRoles = $user ? $user->roles->pluck('id')->toArray() : [];
         // dd($user);
 
     }
 
-    public function save()
+   public function save()
     {
         $this->validate();
 
         DB::beginTransaction();
-        try{
-           
+
+        try {
+            // Save or update employee
             $employee = Employee::updateOrCreate(
                 ['id' => $this->employeeId],
                 [
@@ -114,16 +120,44 @@ class EmployeeProfileForm extends Component
                     'phone' => $this->phone,
                 ]
             );
-            $branchId = collect($this->selectedBranches)->first(); // Get the first selected branch
-            // dd($branchId);
-             if ($employee->user) {
-                $existingUser = $employee->user;
-                // Optional: Update current branch_id only if you want to
-                $existingUser->update([
+
+            // Step 1: Get selected branch and roles
+            $branchId = collect($this->selectedBranches)->first(); // Assuming only one branch is allowed
+            $selectedRoleIds = collect($this->selectedRoles)->toArray();
+
+            $selectedRoles = Role::whereIn('id', $selectedRoleIds)->pluck('name', 'id')->toArray();
+            $roleNames = array_values($selectedRoles);
+
+            // Step 2: Define role groups
+            $multiRoleAllowed = ['sales_man', 'store_keeper'];
+            $restrictedAloneRoles = ['accountant', 'admin', 'super_admin', 'customer'];
+
+            // Step 3: Validate combinations
+
+            // Rule: Restricted roles (accountant etc.) must be alone
+            foreach ($restrictedAloneRoles as $restrictedRole) {
+                if (in_array($restrictedRole, $roleNames) && count($roleNames) > 1) {
+                    session()->flash('failed', ucfirst($restrictedRole) . ' role cannot be combined with any other role.');
+                    return redirect()->back();
+                }
+            }
+
+            // Rule: Only sales_man and store_keeper can be combined
+            if (count($roleNames) > 1) {
+                $diff = array_diff($roleNames, $multiRoleAllowed);
+                if (count($diff) > 0) {
+                    session()->flash('failed', 'Only Sales Man and Store Keeper can be combined. Other roles must be used alone.');
+                    return redirect()->back();
+                }
+            }
+
+            // Step 4: Create or update user
+            if ($employee->user) {
+                $user = $employee->user;
+                $user->update([
                     'name' => $this->employee_name,
                     'branch_id' => $branchId, // optional
                 ]);
-                $user = $existingUser;
             } else {
                 $user = User::create([
                     'name' => $this->employee_name,
@@ -133,28 +167,30 @@ class EmployeeProfileForm extends Component
                 ]);
             }
 
-            // Link user to employee
+            // Step 5: Link user to employee
             $employee->update(['user_id' => $user->id]);
 
-            // Assign role
-            $userRole = Role::firstOrCreate(['name' => 'sales']);
-            $user->roles()->syncWithoutDetaching([$userRole->id => ['user_type' => \App\Models\User::class]]);
+            // Step 6: Sync roles
+            $rolesToSync = collect($selectedRoleIds)->mapWithKeys(function ($roleId) {
+                return [$roleId => ['user_type' => \App\Models\User::class]];
+            })->toArray();
 
-            // Sync branches
+            $user->roles()->sync($rolesToSync);
+
+            // Step 7: Sync branches
             $user->branches()->sync($this->selectedBranches);
-            
+
             DB::commit();
 
-        }catch(\Exception $e){
+            session()->flash('message', 'Employee saved successfully!');
+            $this->showModal = false;
+            $this->resetFields();
+        } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
-
-        
-        session()->flash('message', 'Employee saved successfully!');
-        $this->showModal = false;
-        $this->resetFields();
     }
+
 
     public function resetFields()
     {
@@ -169,5 +205,9 @@ class EmployeeProfileForm extends Component
         $this->national_id = null;
         $this->address = null;
         $this->phone = null;
+        $this->selectedBranches = [];
+        $this->selectedRoles = [];
+        $this->employee_name = null;
+        $this->email = null;
     }
 }

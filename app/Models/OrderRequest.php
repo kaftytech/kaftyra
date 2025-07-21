@@ -9,7 +9,7 @@ class OrderRequest extends Model
 {
     use HasAuditLog;
     protected $fillable = [
-        'customer_id', 'order_id' ,'request_date', 'status', 'approved_by', 'approved_date', 'notes'
+        'customer_id', 'order_id' ,'request_date', 'status', 'approved_by', 'approved_date', 'notes', 'converted_invoice_id', 'branch_id', 'created_by', 'updated_by'
     ];
 
     public function orderItems()

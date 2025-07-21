@@ -126,6 +126,18 @@
                                 </label>
                             @endforeach
                         </div>
+                         <div class="my-4">
+                            <label class="block text-sm font-medium">Roles</label>
+                            @foreach($roles as $role)
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" wire:model.live="selectedRoles" value="{{ $role->id }}">
+                                    <span>{{ $role->display_name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('selectedRoles')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
 
                     </div>
             

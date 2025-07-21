@@ -9,7 +9,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\OrderRequest;
 use App\Models\OrderItem;
-use App\Models\Customer;
+use App\Models\Customers;
 use App\Models\Product;
 use App\Models\Account;
 use App\Models\AccountTransactions;

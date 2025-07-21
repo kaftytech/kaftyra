@@ -76,3 +76,7 @@ Route::post('/switch-branch', function (Illuminate\Http\Request $request) {
     return back();
 })->name('branch.switch')->middleware('auth');
 
+// routes/web.php
+Route::middleware(['auth', 'role:sales_man'])->group(function () {
+    Route::get('/salesman', \App\Livewire\SalesmanDashboard::class)->name('salesman.dashboard');
+});

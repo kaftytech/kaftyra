@@ -78,7 +78,7 @@
                                 <span class="text-red-600">Inactive</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{{ $tax->created_at->format('Y-m-d') }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ $tax->created_at ? $tax->created_at->format('Y-m-d') : '' }}</td>
                         <td class="px-6 py-4 text-right">
                             <a href="{{ route('tax.edit', $tax->id) }}" class="text-blue-600 hover:text-blue-900">
                                 <i class="fas fa-edit"></i>

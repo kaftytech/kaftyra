@@ -360,6 +360,11 @@
                             <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">Customer Purchase History</span>
                             <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="Customer Purchase History">CPH</span>
                         </a>
+                        <a href="{{ route('reports.gstr-one-report') }}" class="block py-2 px-3 text-sm text-gray-300 rounded-md hover:bg-gray-700 hover:text-white {{ request()->routeIs('billing.invoices') ? 'bg-gray-700 text-white' : '' }}"
+                            :class="!isOpen && window.innerWidth >= 768 ? 'pl-0 pr-0 ml-1 mr-1' : ''">
+                            <span :class="isOpen || window.innerWidth < 768 ? '' : 'hidden'">GSTR-1</span>
+                            <span :class="!isOpen && window.innerWidth >= 768 ? '' : 'hidden'" title="GSTR1">GST</span>
+                        </a>
                     </div>
                 </div>
                <!-- Settings Section -->

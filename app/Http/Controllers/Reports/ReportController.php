@@ -31,4 +31,9 @@ class ReportController extends Controller
     {
         return view('reports.customer-purchase-history');
     }
+
+    public function gstrOneReport()
+    {
+        return view('reports.gstr-one-report');
+    }
 }
